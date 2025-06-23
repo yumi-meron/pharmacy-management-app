@@ -5,12 +5,14 @@ class User extends Equatable {
   final String username;
   final String role;
   final int pharmacyId;
+  
 
   const User({
     required this.id,
     required this.username,
     required this.role,
     required this.pharmacyId,
+
   });
 
   @override
