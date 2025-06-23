@@ -7,7 +7,7 @@
 Generated.xcconfig
 
 # Go
-.env
+**/.env
 /bin/
 /vendor/
 /*.exe
