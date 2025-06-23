@@ -1,0 +1,17 @@
+# Flutter
+**/build/
+.dart_tool/
+.packages
+.pub-cache/
+.flutter-plugins
+Generated.xcconfig
+
+# Go
+/bin/
+/vendor/
+/*.exe
+*.log
+*.out
+*.test
+cd '/home/meronweldu/pharmacy-management-app'
+
