@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pharmacist_mobile/core/di/injection.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_state.dart';
@@ -14,7 +15,7 @@ class HomePage extends StatelessWidget {
         actions: [IconButton(icon: Icon(Icons.shopping_cart), onPressed: () {})],
       ),
       body: BlocProvider(
-        create: (context) => MedicineBloc(context.read())..add(SearchMedicines('')),
+        create: (context) => MedicineBloc(getIt())..add(SearchMedicines('')),
         child: Column(
           children: [
             Padding(

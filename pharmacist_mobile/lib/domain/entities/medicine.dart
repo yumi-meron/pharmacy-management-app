@@ -7,8 +7,8 @@ class Medicine extends Equatable {
   final String category;
   final String? description;
   final DateTime createdAt;
-  final String picture; // Added for image URL
-  final List<MedicineVariant> variants; // Added to handle variants
+  final String picture; 
+  final List<MedicineVariant> variants; 
 
   const Medicine({
     required this.id,

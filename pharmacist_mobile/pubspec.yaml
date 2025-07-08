@@ -18,6 +18,8 @@ dependencies:
   get_it: ^7.6.4
   cupertino_icons: ^1.0.8
   http: ^1.4.0
+  dartz: ^0.10.1
+  internet_connection_checker: ^3.0.1
 
 dev_dependencies:
   flutter_test:
@@ -31,4 +33,4 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/dummy_medicines_with_images.json
+    - assets/dummy_medicines.json

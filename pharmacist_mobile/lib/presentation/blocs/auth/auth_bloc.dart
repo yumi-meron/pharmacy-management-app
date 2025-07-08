@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pharmacist_mobile/core/error/failure.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/forgot_password.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/sign_in.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_event.dart';
@@ -16,22 +17,32 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onSignIn(SignInEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
-    try {
-      final user = await signIn(event.email, event.password);
-      emit(AuthAuthenticated(user));
-    } catch (e) {
-      emit(AuthError(e.toString()));
-    }
+    final result = await signIn(event.email, event.password);
+    result.fold(
+      (failure) => emit(AuthError(_mapFailureToMessage(failure))),
+      (user) => emit(AuthAuthenticated(user)),
+    );
   }
 
   Future<void> _onForgotPassword(
       ForgotPasswordEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
-    try {
-      await forgotPassword(event.email);
-      emit(const AuthForgotPasswordSuccess());
-    } catch (e) {
-      emit(AuthError(e.toString()));
+    final result = await forgotPassword(event.email);
+    result.fold(
+      (failure) => emit(AuthError(_mapFailureToMessage(failure))),
+      (_) => emit(const AuthForgotPasswordSuccess()),
+    );
+  }
+
+  String _mapFailureToMessage(Failure failure) {
+    if (failure is ConnectionFailure) {
+      return 'No internet connection';
+    } else if (failure is ServerFailure) {
+      return 'Server error: ${failure.message}';
+    } else if (failure is DatabaseFailure) {
+      return 'Database error';
+    } else {
+      return 'Unexpected error: ${failure.message}';
     }
   }
 }

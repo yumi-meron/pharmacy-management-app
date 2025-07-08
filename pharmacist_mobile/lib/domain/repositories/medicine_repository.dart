@@ -1,6 +1,8 @@
-import 'package:pharmacist_mobile/domain/entities/medicine.dart';
+import 'package:dartz/dartz.dart';
+import '../../core/error/failure.dart';
+import '../entities/medicine.dart';
 
 abstract class MedicineRepository {
-  Future<List<Medicine>> searchMedicines(String query);
-  Future<Medicine> getMedicineDetails(String id); // Returns Medicine with its variants
+  Future<Either<Failure, List<Medicine>>> searchMedicines(String query);
+  Future<Either<Failure, Medicine>> getMedicineDetails(String id);
 }

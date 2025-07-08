@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
 import 'package:pharmacist_mobile/presentation/pages/sign_in_page.dart';
-import 'package:pharmacist_mobile/core/di/injection.dart' as di;
+import 'package:pharmacist_mobile/core/di/injection.dart'; 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await di.init(); // Initialize dependency injection
+  await setup(); // Initialize dependency injection
   runApp(const MyApp());
 }
 
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => di.locator<AuthBloc>(),
+      create: (_) => getIt<AuthBloc>(),
       child: MaterialApp(
         title: 'Pharmacy App',
         theme: ThemeData(
