@@ -9,7 +9,6 @@ import 'package:pharmacist_mobile/data/datasources/medicine_remote_data_source.d
 import 'package:pharmacist_mobile/data/datasources/mock_auth_remote_data_source.dart';
 import 'package:pharmacist_mobile/data/datasources/mock_medicine_remote_datasource.dart';
 import 'package:pharmacist_mobile/data/repositories/auth_repository_impl.dart';
-import 'package:pharmacist_mobile/data/repositories/medicine_repository_impl.dart';
 import 'package:pharmacist_mobile/domain/repositories/auth_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/medicine_repository.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/sign_in.dart';

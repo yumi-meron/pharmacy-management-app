@@ -8,9 +8,11 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     if (phoneNumber == '1234567890' && password == 'password') {
       return const UserModel(
         id: 1,
+        name: "meron",
         username: 'test_user',
         role: 'pharmacist',
         pharmacyId: 1,
+        picture:  'https://i.pravatar.cc/150?img=12', // Default picture
       );
     }
     throw Exception('Invalid phone number or password');

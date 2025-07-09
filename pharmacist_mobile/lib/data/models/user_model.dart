@@ -3,17 +3,21 @@ import 'package:pharmacist_mobile/domain/entities/user.dart';
 class UserModel extends User {
   const UserModel({
     required super.id,
+    required super.name,
     required super.username,
     required super.role,
     required super.pharmacyId,
+    required super.picture,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'],
+      name: json['name'],
       username: json['username'],
       role: json['role'],
       pharmacyId: json['pharmacy_id'],
+      picture: json['picture'] 
     );
   }
 
@@ -23,7 +27,8 @@ class UserModel extends User {
       'username': username,
       'role': role,
       'pharmacy_id': pharmacyId,
+      'picture': picture,
     };
   }
 }
-// This model class extends the User entity and provides methods to convert
+// This model class extends the User entity and provides methods to convert 

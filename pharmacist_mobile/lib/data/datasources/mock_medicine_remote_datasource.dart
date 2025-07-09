@@ -15,6 +15,8 @@ class MockMedicineRepository implements MedicineRepository {
         final jsonString = await rootBundle.loadString('assets/dummy_medicines.json');
         final decoded = json.decode(jsonString) as List;
         _cache = decoded.map((json) => MedicineModel.fromJson(json).toEntity()).toList();
+        print("Loaded ${_cache?.length} medicines");
+
       } catch (e) {
         throw Exception('Failed to load mock data: $e');
       }
