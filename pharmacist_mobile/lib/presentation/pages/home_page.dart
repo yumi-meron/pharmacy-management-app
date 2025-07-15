@@ -39,11 +39,12 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text('Hi, Welcome Back', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      const Text('Hi, Welcome Back', style: TextStyle(fontSize: 12, color: Colors.teal)),
                       Text(user.name, style: const TextStyle(fontSize: 16)),
                     ],
                   ),
                   const Spacer(),
+                  
                   IconButton(
                     icon: const Icon(Icons.shopping_cart),
                     onPressed: () {},
@@ -72,20 +73,23 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Expanded(
                             child: ListView(
-                              padding: const EdgeInsets.all(8.0),
+                              // padding: const EdgeInsets.all(25.0),
                               children: [
                                 TextField(
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     hintText: 'Search...',
-                                    prefixIcon: Icon(Icons.search),
-                                    border: OutlineInputBorder(),
+                                    prefixIcon: const Icon(Icons.search),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
                                   ),
+                                  
                                   onChanged: (query) => context.read<MedicineBloc>().add(SearchMedicines(query)),
                                 ),
                                 const SizedBox(height: 10),
                                 Container(
                                   color: Colors.teal,
-                                  padding: const EdgeInsets.all(10),
+                                  padding: const EdgeInsets.all(16),
                                   child: const Text(
                                     'Love Care Pharmacy',
                                     style: TextStyle(color: Colors.white, fontSize: 20),
@@ -93,6 +97,15 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
+                                Container(
+                                  alignment: Alignment.centerLeft,
+                                  // padding: const EdgeInsets.all(16.0),
+                                  child: const Text(
+                                    'Catagories',
+                                    style: TextStyle(color: Colors.black, fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                                 SizedBox(
                                   height: 40,
                                   child: SingleChildScrollView(
@@ -111,7 +124,16 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
-                                const Text('Recent Purchases', style: TextStyle(fontSize: 18)),
+                                const SizedBox(height: 10),
+                                Container(
+                                  alignment: Alignment.centerLeft,
+                                  // padding: const EdgeInsets.all(16.0),
+                                  child: const Text(
+                                    'Recent Purchases',
+                                    style: TextStyle(color: Colors.black, fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                                 const SizedBox(height: 10),
                                 if (state is MedicineLoading)
                                   const Center(child: CircularProgressIndicator())
