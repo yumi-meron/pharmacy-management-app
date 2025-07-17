@@ -16,6 +16,10 @@ class SearchMedicines extends MedicineEvent {
   List<Object> get props => [query];
 }
 
+class FetchAllMedicines extends MedicineEvent {
+  const FetchAllMedicines();
+}
+
 class FetchMedicineDetails extends MedicineEvent {
   final String id;
 

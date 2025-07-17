@@ -4,7 +4,7 @@ class UserModel extends User {
   const UserModel({
     required super.id,
     required super.name,
-    required super.username,
+    required super.phoneNumber,
     required super.role,
     required super.pharmacyId,
     required super.picture,
@@ -14,7 +14,7 @@ class UserModel extends User {
     return UserModel(
       id: json['id'],
       name: json['name'],
-      username: json['username'],
+      phoneNumber: json['phone_number'],
       role: json['role'],
       pharmacyId: json['pharmacy_id'],
       picture: json['picture'] 
@@ -24,7 +24,8 @@ class UserModel extends User {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'username': username,
+      'name': name,
+      'phone_number': phoneNumber,
       'role': role,
       'pharmacy_id': pharmacyId,
       'picture': picture,

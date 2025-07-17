@@ -10,6 +10,7 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
   MedicineBloc(this.repository) : super(MedicineInitial()) {
     on<SearchMedicines>(_onSearchMedicines);
     on<FetchMedicineDetails>(_onFetchMedicineDetails);
+    on<FetchAllMedicines>(_onFetchAllMedicines);
   }
 
   Future<void> _onSearchMedicines(
@@ -21,6 +22,19 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
       (medicines) => emit(MedicineLoaded(medicines)),
     );
   }
+  
+
+  Future<void> _onFetchAllMedicines(
+      FetchAllMedicines event, Emitter<MedicineState> emit) async {
+    emit(MedicineLoading());
+    final result = await repository.getAllMedicines(); // from MedicineRepository
+    print('hibaby: $result');
+    result.fold(
+      (failure) => emit(MedicineError(_mapFailureToMessage(failure))),
+      (medicines) => emit(MedicineLoaded(medicines)),
+    );
+  }
+
 
   Future<void> _onFetchMedicineDetails(
       FetchMedicineDetails event, Emitter<MedicineState> emit) async {
