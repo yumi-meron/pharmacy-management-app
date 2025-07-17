@@ -13,27 +13,36 @@ import 'package:pharmacist_mobile/domain/repositories/auth_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/medicine_repository.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/sign_in.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/forgot_password.dart';
+import 'package:pharmacist_mobile/domain/usecases/medicine/search_medicine.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt getIt = GetIt.instance;
 
 Future<void> setup() async {
   // External dependencies
+  final sharedPrefs = await SharedPreferences.getInstance();
+  getIt.registerSingleton<SharedPreferences>(sharedPrefs);
   getIt.registerSingleton<Dio>(Dio());
   getIt.registerSingleton<http.Client>(http.Client());
   getIt.registerSingleton<InternetConnectionChecker>(InternetConnectionChecker.createInstance());
+  
 
   // Core
   getIt.registerSingleton<NetworkInfo>(NetworkInfoImpl(getIt()));
+  getIt.registerLazySingleton(() => SearchMedicines(getIt()));
 
   // Data Sources
-  // getIt.registerSingleton<AuthRemoteDataSource>(RemoteDataSourceImpl(dio: getIt()));
+  // getIt.registerSingleton<AuthRemoteDataSource>(
+  //   RemoteDataSourceImpl(dio: getIt(), prefs: getIt()),
+  // );
 
   //Fake path
   getIt.registerSingleton<AuthRemoteDataSource>(MockAuthRemoteDataSource());
 
 
-  getIt.registerSingleton<MedicineRemoteDataSource>(MedicineRemoteDataSource(client: getIt()));
+  getIt.registerSingleton<MedicineRemoteDataSource>(MedicineRemoteDataSource(client: getIt(),prefs: getIt()));
 
   // Repositories
   getIt.registerSingleton<AuthRepository>(
@@ -59,4 +68,5 @@ Future<void> setup() async {
         signIn: getIt(),
         forgotPassword: getIt(),
       ));
+  getIt.registerFactory(() => MedicineBloc(getIt<MedicineRepository>()));
 }
