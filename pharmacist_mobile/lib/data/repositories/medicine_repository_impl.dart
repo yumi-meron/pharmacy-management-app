@@ -31,4 +31,12 @@ class MedicineRepositoryImpl implements MedicineRepository {
       return const Left(ConnectionFailure('No internet connection'));
     }
   }
+  @override
+  Future<Either<Failure, List<Medicine>>> getAllMedicines() async {
+    if (await networkInfo.isConnected) {
+      return await dataSource.getAllMedicines();
+    } else {
+      return const Left(ConnectionFailure('No internet connection'));
+    }
+  }
 }

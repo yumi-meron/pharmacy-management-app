@@ -43,7 +43,7 @@ class _InventoryPageState extends State<InventoryPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<MedicineBloc>()..add(const SearchMedicines('')),
+      create: (_) => getIt<MedicineBloc>()..add(const FetchAllMedicines()),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(

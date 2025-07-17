@@ -9,6 +9,7 @@ import 'package:pharmacist_mobile/data/datasources/medicine_remote_data_source.d
 import 'package:pharmacist_mobile/data/datasources/mock_auth_remote_data_source.dart';
 import 'package:pharmacist_mobile/data/datasources/mock_medicine_remote_datasource.dart';
 import 'package:pharmacist_mobile/data/repositories/auth_repository_impl.dart';
+import 'package:pharmacist_mobile/data/repositories/medicine_repository_impl.dart';
 import 'package:pharmacist_mobile/domain/repositories/auth_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/medicine_repository.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/sign_in.dart';
@@ -34,12 +35,12 @@ Future<void> setup() async {
   getIt.registerLazySingleton(() => SearchMedicines(getIt()));
 
   // Data Sources
-  // getIt.registerSingleton<AuthRemoteDataSource>(
-  //   RemoteDataSourceImpl(dio: getIt(), prefs: getIt()),
-  // );
+  getIt.registerSingleton<AuthRemoteDataSource>(
+    RemoteDataSourceImpl(dio: getIt(), prefs: getIt()),
+  );
 
   //Fake path
-  getIt.registerSingleton<AuthRemoteDataSource>(MockAuthRemoteDataSource());
+  // getIt.registerSingleton<AuthRemoteDataSource>(MockAuthRemoteDataSource());
 
 
   getIt.registerSingleton<MedicineRemoteDataSource>(MedicineRemoteDataSource(client: getIt(),prefs: getIt()));
@@ -51,11 +52,11 @@ Future<void> setup() async {
 
 
   //real path
-  // getIt.registerSingleton<MedicineRepository>(
-  //   MedicineRepositoryImpl(dataSource: getIt(), networkInfo: getIt()),
-  // );
+  getIt.registerSingleton<MedicineRepository>(
+    MedicineRepositoryImpl(dataSource: getIt(), networkInfo: getIt()),
+  );
   //fake
-  getIt.registerSingleton<MedicineRepository>(MockMedicineRepository());
+  // getIt.registerSingleton<MedicineRepository>(MockMedicineRepository());
 
 
   

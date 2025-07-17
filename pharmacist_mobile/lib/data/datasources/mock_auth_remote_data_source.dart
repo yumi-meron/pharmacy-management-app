@@ -8,11 +8,11 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   Future<Either<Failure, UserModel>> signIn(String phoneNumber, String password) async {
     if (phoneNumber == '1234567890' && password == 'password') {
       return const Right(UserModel(
-        id: 1,
+        id: '1',
         name: "meron",
-        username: 'test_user',
+        phoneNumber: 'test_user',
         role: 'pharmacist',
-        pharmacyId: 1,
+        pharmacyId: '1',
         picture: 'https://i.pravatar.cc/150?img=12',
       ));
     } else {

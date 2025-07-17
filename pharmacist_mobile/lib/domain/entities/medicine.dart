@@ -7,7 +7,9 @@ class Medicine extends Equatable {
   final String category;
   final String? description;
   final DateTime createdAt;
+  final DateTime updatedAt;
   final String picture; 
+  final String pharmacyId;
   final List<MedicineVariant> variants; 
 
   const Medicine({
@@ -16,10 +18,12 @@ class Medicine extends Equatable {
     required this.category,
     this.description,
     required this.createdAt,
+    required this.updatedAt,
     required this.picture,
+    required this.pharmacyId,
     required this.variants,
   });
 
   @override
-  List<Object?> get props => [id, name, category, description, createdAt, picture, variants];
+  List<Object?> get props => [id, name, category, description, createdAt,updatedAt, picture,pharmacyId ,variants];
 }
