@@ -28,6 +28,7 @@ class MedicineWidget extends StatelessWidget {
               child: Image.network(
                 medicine.picture,
                 height: 90, // was 100
+                // width: 100,
                 width: double.infinity,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) =>

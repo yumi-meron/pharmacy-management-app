@@ -1,39 +1,52 @@
 import 'package:dio/dio.dart';
+import 'package:dartz/dartz.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:pharmacist_mobile/core/constants/api_constants.dart';
-import 'package:pharmacist_mobile/core/error/server_error.dart';
+import 'package:pharmacist_mobile/core/error/failure.dart';
 import 'package:pharmacist_mobile/data/models/user_model.dart';
 
-
 abstract class AuthRemoteDataSource {
-  Future<UserModel> signIn(String phoneNumber, String password);
-  Future<void> forgotPassword(String phoneNumber);
+  Future<Either<Failure, UserModel>> signIn(String phoneNumber, String password);
+  Future<Either<Failure, void>> forgotPassword(String phoneNumber);
 }
 
 class RemoteDataSourceImpl extends AuthRemoteDataSource {
   final Dio dio;
+  final SharedPreferences prefs;
 
-  RemoteDataSourceImpl({required this.dio});
+  RemoteDataSourceImpl({required this.dio, required this.prefs});
 
   @override
-  Future<UserModel> signIn(String phoneNumber, String password) async {
+  Future<Either<Failure, UserModel>> signIn(String phoneNumber, String password) async {
     try {
       final response = await dio.post(
         '${ApiConstants.baseUrl}${ApiConstants.signIn}',
         data: {'phone_number': phoneNumber, 'password': password},
       );
 
-      if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data['user']);
+      if (response.statusCode == 200 && response.data['user'] != null) {
+        final user = UserModel.fromJson(response.data['user']);
+
+        // Save the token
+        final token = response.data['token'];
+        if (token != null) {
+          await prefs.setString('token', token);
+        }
+
+        return Right(user);
       } else {
-        throw ServerException('Failed to sign in: ${response.statusCode}');
+        return Left(ServerFailure('Failed to sign in: ${response.statusCode}'));
       }
+    } on DioError catch (e) {
+      return Left(ServerFailure(_getErrorMessage(e)));
     } catch (e) {
-      throw ServerException('Failed to sign in: ${e.toString()}');
+      return Left(ServerFailure('Unexpected error: ${e.toString()}'));
     }
   }
 
   @override
-  Future<void> forgotPassword(String phoneNumber) async {
+  Future<Either<Failure, void>> forgotPassword(String phoneNumber) async {
     try {
       final response = await dio.post(
         '${ApiConstants.baseUrl}${ApiConstants.forgotPassword}',
@@ -41,12 +54,21 @@ class RemoteDataSourceImpl extends AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        return;
+        return const Right(null);
       } else {
-        throw ServerException('Failed to process forgot password: ${response.statusCode}');
+        return Left(ServerFailure('Failed to process forgot password: ${response.statusCode}'));
       }
+    } on DioError catch (e) {
+      return Left(ServerFailure(_getErrorMessage(e)));
     } catch (e) {
-      throw ServerException('Failed to process forgot password: ${e.toString()}');
+      return Left(ServerFailure('Unexpected error: ${e.toString()}'));
     }
+  }
+
+  String _getErrorMessage(DioError e) {
+    if (e.response != null && e.response?.data is Map && e.response?.data['message'] != null) {
+      return e.response?.data['message'];
+    }
+    return e.message ?? 'Unknown error';
   }
 }
