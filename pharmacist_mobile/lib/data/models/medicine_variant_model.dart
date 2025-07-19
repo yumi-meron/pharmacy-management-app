@@ -88,7 +88,7 @@ class MedicineVariantModel {
       unit: json['unit'],
       pricePerUnit: json['price_per_unit'].toDouble(),
       expiryDate: DateTime.parse(json['expiry_date']),
-      quantityAvailable: json['quantity_available'],
+      quantityAvailable: json['stock'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
