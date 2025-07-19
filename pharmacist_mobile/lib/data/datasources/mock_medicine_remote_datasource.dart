@@ -12,9 +12,12 @@ class MockMedicineRepository implements MedicineRepository {
   Future<void> _loadMockData() async {
     if (_cache == null) {
       try {
-        final jsonString = await rootBundle.loadString('assets/dummy_medicines.json');
+        final jsonString =
+            await rootBundle.loadString('assets/dummy_medicines.json');
         final decoded = json.decode(jsonString) as List;
-        _cache = decoded.map((json) => MedicineModel.fromJson(json).toEntity()).toList();
+        _cache = decoded
+            .map((json) => MedicineModel.fromJson(json).toEntity())
+            .toList();
         // print("Loaded ${_cache?.length} medicines");
       } catch (e) {
         throw Exception('Failed to load mock data: $e');
@@ -38,7 +41,9 @@ class MockMedicineRepository implements MedicineRepository {
       await _loadMockData();
       final result = query.isEmpty
           ? _cache!
-          : _cache!.where((m) => m.name.toLowerCase().contains(query.toLowerCase())).toList();
+          : _cache!
+              .where((m) => m.name.toLowerCase().contains(query.toLowerCase()))
+              .toList();
       return Right(result);
     } catch (e) {
       return Left(ServerFailure('Mock error: ${e.toString()}'));
@@ -49,7 +54,8 @@ class MockMedicineRepository implements MedicineRepository {
   Future<Either<Failure, Medicine>> getMedicineDetails(String id) async {
     try {
       await _loadMockData();
-      final medicine = _cache!.firstWhere((m) => m.id == id, orElse: () => throw Exception('Not found'));
+      final medicine = _cache!.firstWhere((m) => m.id == id,
+          orElse: () => throw Exception('Not found'));
       return Right(medicine);
     } catch (e) {
       return Left(ServerFailure('Mock error: ${e.toString()}'));
