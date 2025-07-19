@@ -61,7 +61,6 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Stack(
         children: [
-          // Main content
           SafeArea(
             child: BlocProvider(
               create: (context) => MedicineBloc(getIt())..add(const FetchAllMedicines()),
@@ -71,103 +70,128 @@ class _HomePageState extends State<HomePage> {
                     index: _selectedIndex,
                     children: [
                       // Home content
-                      Column(
-                        children: [
-                          Expanded(
-                            child: ListView(
-                              // padding: const EdgeInsets.all(25.0),
-                              children: [
-                                TextField(
-                                  decoration: InputDecoration(
-                                    hintText: 'Search...',
-                                    prefixIcon: const Icon(Icons.search),
-                                    border: OutlineInputBorder(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: ListView(
+                                children: [
+                                  const SizedBox(height: 20),
+                                  TextField(
+                                    decoration: InputDecoration(
+                                      hintText: 'Search...',
+                                      prefixIcon: const Icon(Icons.search),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                    onChanged: (query) => context.read<MedicineBloc>().add(SearchMedicines(query)),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Container(
+                                    height: 100,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                        colors: [
+                                          Color(0xFF004D40),
+                                          Colors.teal,
+                                          Color(0xFFB2DFDB),
+                                        ],
+                                      ),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
-                                  ),
-                                  
-                                  onChanged: (query) => context.read<MedicineBloc>().add(SearchMedicines(query)),
-                                ),
-                                const SizedBox(height: 10),
-                                Container(
-                                  color: Colors.teal,
-                                  padding: const EdgeInsets.all(16),
-                                  child: const Text(
-                                    'Love Care Pharmacy',
-                                    style: TextStyle(color: Colors.white, fontSize: 20),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  // padding: const EdgeInsets.all(16.0),
-                                  child: const Text(
-                                    'Catagories',
-                                    style: TextStyle(color: Colors.black, fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 40,
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children: ['Antibiotics', 'Vitamins', 'Pain Relief', 'Cold & Flu']
-                                          .map((cat) => Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                                                child: ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: Text(cat),
-                                                ),
-                                              ))
-                                          .toList(),
+                                    alignment: Alignment.centerLeft,
+                                    child: const Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Love Care',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Pharmacy',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 10),
-                                const SizedBox(height: 10),
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  // padding: const EdgeInsets.all(16.0),
-                                  child: const Text(
-                                    'Recent Purchases',
-                                    style: TextStyle(color: Colors.black, fontSize: 12),
-                                    textAlign: TextAlign.center,
+                                  const SizedBox(height: 20),
+                                  const Text(
+                                    'Categories',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 10),
-                                if (state is MedicineLoading)
-                                  const Center(child: CircularProgressIndicator())
-                                else if (state is MedicineError)
-                                  Text('Error: ${state.message}')
-                                else if (state is MedicineLoaded)
+                                  const SizedBox(height: 10),
                                   SizedBox(
-                                    height: 260,
+                                    height: 40,
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
-                                        children: state.medicines.map((medicine) {
-                                          return Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                            child: MedicineWidget(medicine: medicine),
-                                          );
-                                        }).toList(),
+                                        children: ['Antibiotics', 'Vitamins', 'Pain Relief', 'Cold & Flu']
+                                            .map((cat) => Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                                                  child: ElevatedButton(
+                                                    onPressed: () {},
+                                                    child: Text(cat),
+                                                  ),
+                                                ))
+                                            .toList(),
                                       ),
                                     ),
-                                  )
-                                else
-                                  const SizedBox.shrink(),
-                              ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  const Text(
+                                    'Recent Purchases',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  if (state is MedicineLoading)
+                                    const Center(child: CircularProgressIndicator())
+                                  else if (state is MedicineError)
+                                    Text('Error: ${state.message}')
+                                  else if (state is MedicineLoaded)
+                                    SizedBox(
+                                      height: 260,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: state.medicines.map((medicine) {
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                              child: MedicineWidget(medicine: medicine),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    const SizedBox.shrink(),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      // Inventory content (placeholder)
                       const InventoryPage(),
-                      // Orders content (placeholder)
                       const OrdersPage(),
-                      // Settings content (placeholder)
                       const SettingsPage(),
                     ],
                   );
@@ -175,7 +199,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          
+
           // Bottom Navigation Bar
           Positioned(
             left: 0,
@@ -187,15 +211,15 @@ class _HomePageState extends State<HomePage> {
                 setState(() {
                   _selectedIndex = index;
                 });
-                // No navigation logic needed; IndexedStack handles page switching
               },
             ),
           ),
-        // QR Code Icon
+
+          // QR Code Icon
           Positioned(
             left: 0,
             right: 0,
-            bottom: 20, // Position above the bottom navigation bar
+            bottom: 20,
             child: Center(
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -220,7 +244,8 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
-      ),
+      )
+
     );
   }
 }
