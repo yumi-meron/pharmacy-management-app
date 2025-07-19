@@ -27,8 +27,8 @@ Future<void> setup() async {
   getIt.registerSingleton<SharedPreferences>(sharedPrefs);
   getIt.registerSingleton<Dio>(Dio());
   getIt.registerSingleton<http.Client>(http.Client());
-  getIt.registerSingleton<InternetConnectionChecker>(InternetConnectionChecker.createInstance());
-  
+  getIt.registerSingleton<InternetConnectionChecker>(
+      InternetConnectionChecker.createInstance());
 
   // Core
   getIt.registerSingleton<NetworkInfo>(NetworkInfoImpl(getIt()));
@@ -42,14 +42,13 @@ Future<void> setup() async {
   //Fake path
   // getIt.registerSingleton<AuthRemoteDataSource>(MockAuthRemoteDataSource());
 
-
-  getIt.registerSingleton<MedicineRemoteDataSource>(MedicineRemoteDataSource(client: getIt(),prefs: getIt()));
+  getIt.registerSingleton<MedicineRemoteDataSource>(
+      MedicineRemoteDataSource(client: getIt(), prefs: getIt()));
 
   // Repositories
   getIt.registerSingleton<AuthRepository>(
     AuthRepositoryImpl(remoteDataSource: getIt(), networkInfo: getIt()),
   );
-
 
   //real path
   getIt.registerSingleton<MedicineRepository>(
@@ -58,8 +57,6 @@ Future<void> setup() async {
   //fake
   // getIt.registerSingleton<MedicineRepository>(MockMedicineRepository());
 
-
-  
   // Use Cases
   getIt.registerSingleton<SignIn>(SignIn(getIt()));
   getIt.registerSingleton<ForgotPassword>(ForgotPassword(getIt()));
