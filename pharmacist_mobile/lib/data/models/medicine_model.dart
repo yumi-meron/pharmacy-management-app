@@ -5,7 +5,7 @@ import 'package:pharmacist_mobile/domain/entities/medicine_variant.dart';
 class MedicineModel {
   final String id;
   final String name;
-  final String category;
+  final String? category;
   final String? description;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -36,15 +36,16 @@ class MedicineModel {
       pharmacyId: json['pharmacy_id'],
       picture: json['picture'],
       variants: (json['variants'] as List<dynamic>?)
-          ?.map((v) => MedicineVariantModel.fromJson(v))
-          .toList() ?? [],
+              ?.map((v) => MedicineVariantModel.fromJson(v))
+              .toList() ??
+          [],
     );
   }
 
   Medicine toEntity() => Medicine(
         id: id,
         name: name,
-        category: category,
+        category: category ?? '',
         description: description,
         createdAt: createdAt,
         updatedAt: updatedAt,
