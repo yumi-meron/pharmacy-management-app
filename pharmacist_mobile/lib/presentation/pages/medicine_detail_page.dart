@@ -151,6 +151,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                               if (medicine.description != null &&
                                   medicine.description!.isNotEmpty) ...[
                                 Container(
+                                  width: double.infinity,
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
                                     border: Border.all(
