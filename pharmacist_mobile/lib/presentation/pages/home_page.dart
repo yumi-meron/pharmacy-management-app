@@ -41,12 +41,12 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text('Hi, Welcome Back', style: TextStyle(fontSize: 12, color: Colors.teal)),
+                      const Text('Hi, Welcome Back',
+                          style: TextStyle(fontSize: 12, color: Colors.teal)),
                       Text(user.name, style: const TextStyle(fontSize: 16)),
                     ],
                   ),
                   const Spacer(),
-                  
                   IconButton(
                     icon: const Icon(Icons.shopping_cart),
                     onPressed: () {},
@@ -64,7 +64,11 @@ class _HomePageState extends State<HomePage> {
           // Main content
           SafeArea(
             child: BlocProvider(
-              create: (context) => MedicineBloc(getIt())..add(const FetchAllMedicines()),
+              create: (context) => MedicineBloc(
+                getIt(), // Pass the required positional argument
+                repository: getIt(),
+                getMedicineDetails: getIt(),
+              )..add(const FetchAllMedicines()),
               child: BlocBuilder<MedicineBloc, MedicineState>(
                 builder: (context, state) {
                   return IndexedStack(
@@ -85,8 +89,9 @@ class _HomePageState extends State<HomePage> {
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                   ),
-                                  
-                                  onChanged: (query) => context.read<MedicineBloc>().add(SearchMedicines(query)),
+                                  onChanged: (query) => context
+                                      .read<MedicineBloc>()
+                                      .add(SearchMedicines(query)),
                                 ),
                                 const SizedBox(height: 10),
                                 Container(
@@ -94,7 +99,8 @@ class _HomePageState extends State<HomePage> {
                                   padding: const EdgeInsets.all(16),
                                   child: const Text(
                                     'Love Care Pharmacy',
-                                    style: TextStyle(color: Colors.white, fontSize: 20),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -104,7 +110,8 @@ class _HomePageState extends State<HomePage> {
                                   // padding: const EdgeInsets.all(16.0),
                                   child: const Text(
                                     'Catagories',
-                                    style: TextStyle(color: Colors.black, fontSize: 12),
+                                    style: TextStyle(
+                                        color: Colors.black, fontSize: 12),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -113,9 +120,16 @@ class _HomePageState extends State<HomePage> {
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
-                                      children: ['Antibiotics', 'Vitamins', 'Pain Relief', 'Cold & Flu']
+                                      children: [
+                                        'Antibiotics',
+                                        'Vitamins',
+                                        'Pain Relief',
+                                        'Cold & Flu'
+                                      ]
                                           .map((cat) => Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6.0),
                                                 child: ElevatedButton(
                                                   onPressed: () {},
                                                   child: Text(cat),
@@ -132,13 +146,15 @@ class _HomePageState extends State<HomePage> {
                                   // padding: const EdgeInsets.all(16.0),
                                   child: const Text(
                                     'Recent Purchases',
-                                    style: TextStyle(color: Colors.black, fontSize: 12),
+                                    style: TextStyle(
+                                        color: Colors.black, fontSize: 12),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
                                 const SizedBox(height: 10),
                                 if (state is MedicineLoading)
-                                  const Center(child: CircularProgressIndicator())
+                                  const Center(
+                                      child: CircularProgressIndicator())
                                 else if (state is MedicineError)
                                   Text('Error: ${state.message}')
                                 else if (state is MedicineLoaded)
@@ -147,10 +163,13 @@ class _HomePageState extends State<HomePage> {
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
-                                        children: state.medicines.map((medicine) {
+                                        children:
+                                            state.medicines.map((medicine) {
                                           return Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                            child: MedicineWidget(medicine: medicine),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: MedicineWidget(
+                                                medicine: medicine),
                                           );
                                         }).toList(),
                                       ),
@@ -175,7 +194,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          
+
           // Bottom Navigation Bar
           Positioned(
             left: 0,
@@ -191,7 +210,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ),
-        // QR Code Icon
+          // QR Code Icon
           Positioned(
             left: 0,
             right: 0,

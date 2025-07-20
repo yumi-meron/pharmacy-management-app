@@ -14,6 +14,7 @@ import 'package:pharmacist_mobile/domain/repositories/auth_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/medicine_repository.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/sign_in.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/forgot_password.dart';
+import 'package:pharmacist_mobile/domain/usecases/medicine/get_medicine_details.dart';
 import 'package:pharmacist_mobile/domain/usecases/medicine/search_medicine.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
@@ -61,10 +62,17 @@ Future<void> setup() async {
   getIt.registerSingleton<SignIn>(SignIn(getIt()));
   getIt.registerSingleton<ForgotPassword>(ForgotPassword(getIt()));
 
+  // Added Use Case
+  getIt.registerLazySingleton(() => GetMedicineDetails(getIt()));
+
   // Blocs
   getIt.registerFactory(() => AuthBloc(
         signIn: getIt(),
         forgotPassword: getIt(),
       ));
-  getIt.registerFactory(() => MedicineBloc(getIt<MedicineRepository>()));
+  getIt.registerFactory(() => MedicineBloc(
+        getIt<MedicineRepository>(),
+        repository: getIt<MedicineRepository>(),
+        getMedicineDetails: getIt<GetMedicineDetails>(),
+      ));
 }
