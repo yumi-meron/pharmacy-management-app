@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           SafeArea(
             child: BlocProvider(
-              create: (context) => MedicineBloc(getIt())..add(const FetchAllMedicines()),
+              create: (context) => MedicineBloc(getIt(),repository: getIt(),getMedicineDetails: getIt())..add(const FetchAllMedicines()),
               child: BlocBuilder<MedicineBloc, MedicineState>(
                 builder: (context, state) {
                   return IndexedStack(
@@ -201,52 +201,49 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // Bottom Navigation Bar
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: CustomBottomNavigationBar(
-              selectedIndex: _selectedIndex,
-              onTap: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
+            // Bottom Navigation Bar
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: CustomBottomNavigationBar(
+                selectedIndex: _selectedIndex,
+                onTap: (index) {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
+              ),
             ),
-          ),
-
-          // QR Code Icon
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 20,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.teal,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.qr_code_scanner,
-                  size: 30,
-                  color: Colors.white,
+            // QR Code Icon
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 20,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.teal,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.qr_code_scanner,
+                    size: 30,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      )
-
-    );
+          ],
+        ));
   }
 }

@@ -1,15 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pharmacist_mobile/core/error/failure.dart';
 import 'package:pharmacist_mobile/domain/repositories/medicine_repository.dart';
+import 'package:pharmacist_mobile/domain/usecases/medicine/get_medicine_details.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_state.dart';
 
 class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
   final MedicineRepository repository;
+  final GetMedicineDetails getMedicineDetails;
 
-  MedicineBloc(this.repository) : super(MedicineInitial()) {
+  MedicineBloc(
+    MedicineRepository medicineRepository, {
+    required this.repository,
+    required this.getMedicineDetails,
+  }) : super(MedicineInitial()) {
     on<SearchMedicines>(_onSearchMedicines);
-    on<FetchMedicineDetails>(_onFetchMedicineDetails);
+    on<GetMedicineDetailsEvent>(_onGetMedicineDetailsEvent);
     on<FetchAllMedicines>(_onFetchAllMedicines);
   }
 
@@ -22,24 +28,21 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
       (medicines) => emit(MedicineLoaded(medicines)),
     );
   }
-  
 
   Future<void> _onFetchAllMedicines(
       FetchAllMedicines event, Emitter<MedicineState> emit) async {
     emit(MedicineLoading());
-    final result = await repository.getAllMedicines(); // from MedicineRepository
-    print('hibaby: $result');
+    final result = await repository.getAllMedicines();
     result.fold(
       (failure) => emit(MedicineError(_mapFailureToMessage(failure))),
       (medicines) => emit(MedicineLoaded(medicines)),
     );
   }
 
-
-  Future<void> _onFetchMedicineDetails(
-      FetchMedicineDetails event, Emitter<MedicineState> emit) async {
+  Future<void> _onGetMedicineDetailsEvent(
+      GetMedicineDetailsEvent event, Emitter<MedicineState> emit) async {
     emit(MedicineLoading());
-    final result = await repository.getMedicineDetails(event.id);
+    final result = await getMedicineDetails(event.id);
     result.fold(
       (failure) => emit(MedicineError(_mapFailureToMessage(failure))),
       (medicine) => emit(MedicineDetailsLoaded(medicine)),

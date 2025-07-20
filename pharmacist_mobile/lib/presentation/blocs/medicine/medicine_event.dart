@@ -28,3 +28,14 @@ class FetchMedicineDetails extends MedicineEvent {
   @override
   List<Object> get props => [id];
 }
+
+class GetMedicineDetailsEvent extends MedicineEvent {
+  final String medicineId;
+
+  final String id;
+
+  const GetMedicineDetailsEvent(this.medicineId) : id = medicineId;
+
+  @override
+  List<Object> get props => [medicineId];
+}
