@@ -25,40 +25,44 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) {
-            if (state is AuthAuthenticated) {
-              final user = state.user;
-              return Row(
-                children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(user.picture),
-                    radius: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+      appBar: _selectedIndex == 0
+        ? AppBar(
+            title: BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                if (state is AuthAuthenticated) {
+                  final user = state.user;
+                  return Row(
                     children: [
-                      const Text('Hi, Welcome Back', style: TextStyle(fontSize: 12, color: Colors.teal)),
-                      Text(user.name, style: const TextStyle(fontSize: 16)),
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(user.picture),
+                        radius: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Hi, Welcome Back',
+                            style: TextStyle(fontSize: 12, color: Colors.teal),
+                          ),
+                          Text(user.name, style: const TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.shopping_cart),
+                        onPressed: () {},
+                      ),
                     ],
-                  ),
-                  const Spacer(),
-                  
-                  IconButton(
-                    icon: const Icon(Icons.shopping_cart),
-                    onPressed: () {},
-                  ),
-                ],
-              );
-            } else {
-              return const Text("Love Care Pharmacy");
-            }
-          },
-        ),
-      ),
+                  );
+                } else {
+                  return const Text("Love Care Pharmacy");
+                }
+              },
+            ),
+          )
+        : null, // Hide AppBar on other pages
       body: Stack(
         children: [
           SafeArea(
@@ -162,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const SizedBox(height: 10),
+                                  // const SizedBox(height: 10),
                                   if (state is MedicineLoading)
                                     const Center(child: CircularProgressIndicator())
                                   else if (state is MedicineError)
@@ -174,10 +178,7 @@ class _HomePageState extends State<HomePage> {
                                         scrollDirection: Axis.horizontal,
                                         child: Row(
                                           children: state.medicines.map((medicine) {
-                                            return Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                              child: MedicineWidget(medicine: medicine),
-                                            );
+                                            return MedicineWidget(medicine: medicine);
                                           }).toList(),
                                         ),
                                       ),

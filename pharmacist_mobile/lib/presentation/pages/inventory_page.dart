@@ -47,7 +47,7 @@ class _InventoryPageState extends State<InventoryPage> {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          backgroundColor: Colors.grey[200],
+          // backgroundColor: Colors.grey[200],
           elevation: 0,
           toolbarHeight: 70,
           title: TextField(
@@ -64,6 +64,17 @@ class _InventoryPageState extends State<InventoryPage> {
               fillColor: Colors.white,
             ),
           ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(left: 2.0, right: 16.0 ),
+              child: IconButton(
+               icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  // Handle notifications
+                },
+              ),
+            ),
+          ]
         ),
         body: Column(
           children: [
