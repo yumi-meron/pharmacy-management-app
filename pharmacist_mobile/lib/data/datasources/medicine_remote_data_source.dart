@@ -53,7 +53,7 @@ class MedicineRemoteDataSource {
         final result = data
             .map((json) => MedicineModel.fromJson(json).toEntity())
             .toList();
-        print(result);
+        // print(result);
         return Right(result);
       } else {
         return const Left(ServerFailure('Failed to load all medicines'));

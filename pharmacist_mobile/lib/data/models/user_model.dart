@@ -31,5 +31,6 @@ class UserModel extends User {
       'picture': picture,
     };
   }
+  User toEntity() => this;
 }
 // This model class extends the User entity and provides methods to convert 

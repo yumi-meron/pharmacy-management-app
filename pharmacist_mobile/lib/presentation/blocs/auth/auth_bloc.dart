@@ -13,6 +13,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       : super(AuthInitial()) {
     on<SignInEvent>(_onSignIn);
     on<ForgotPasswordEvent>(_onForgotPassword);
+    on<AuthLoggedOut>(_onLoggedOut);
   }
 
   Future<void> _onSignIn(SignInEvent event, Emitter<AuthState> emit) async {
@@ -33,6 +34,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (_) => emit(const AuthForgotPasswordSuccess()),
     );
   }
+
+  Future<void> _onLoggedOut(AuthLoggedOut event, Emitter<AuthState> emit) async {
+  emit(const AuthUnauthenticated());
+}
 
   String _mapFailureToMessage(Failure failure) {
     if (failure is ConnectionFailure) {
