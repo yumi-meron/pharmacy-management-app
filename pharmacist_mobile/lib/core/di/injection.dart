@@ -5,18 +5,22 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 import 'package:pharmacist_mobile/core/network/network_info.dart';
 import 'package:pharmacist_mobile/data/datasources/auth_remote_data_source.dart';
+import 'package:pharmacist_mobile/data/datasources/employee_remote_datasource.dart';
 import 'package:pharmacist_mobile/data/datasources/medicine_remote_data_source.dart';
 import 'package:pharmacist_mobile/data/datasources/mock_auth_remote_data_source.dart';
 import 'package:pharmacist_mobile/data/datasources/mock_medicine_remote_datasource.dart';
 import 'package:pharmacist_mobile/data/repositories/auth_repository_impl.dart';
+import 'package:pharmacist_mobile/data/repositories/employee_repository_impl.dart';
 import 'package:pharmacist_mobile/data/repositories/medicine_repository_impl.dart';
 import 'package:pharmacist_mobile/domain/repositories/auth_repository.dart';
+import 'package:pharmacist_mobile/domain/repositories/employee_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/medicine_repository.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/sign_in.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/forgot_password.dart';
 import 'package:pharmacist_mobile/domain/usecases/medicine/get_medicine_details.dart';
 import 'package:pharmacist_mobile/domain/usecases/medicine/search_medicine.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/employee/employee_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -40,22 +44,29 @@ Future<void> setup() async {
     RemoteDataSourceImpl(dio: getIt(), prefs: getIt()),
   );
 
-  //Fake path
+  // Fake path
   // getIt.registerSingleton<AuthRemoteDataSource>(MockAuthRemoteDataSource());
 
   getIt.registerSingleton<MedicineRemoteDataSource>(
       MedicineRemoteDataSource(client: getIt(), prefs: getIt()));
+
+  getIt.registerSingleton<EmployeeDataSource>(
+      EmployeeDataSourceImpl(prefs: getIt()));
 
   // Repositories
   getIt.registerSingleton<AuthRepository>(
     AuthRepositoryImpl(remoteDataSource: getIt(), networkInfo: getIt()),
   );
 
-  //real path
   getIt.registerSingleton<MedicineRepository>(
     MedicineRepositoryImpl(dataSource: getIt(), networkInfo: getIt()),
   );
-  //fake
+
+  getIt.registerSingleton<EmployeeRepository>(
+    EmployeeRepositoryImpl(dataSource: getIt()),
+  );
+
+  // Fake
   // getIt.registerSingleton<MedicineRepository>(MockMedicineRepository());
 
   // Use Cases
@@ -75,4 +86,5 @@ Future<void> setup() async {
         repository: getIt<MedicineRepository>(),
         getMedicineDetails: getIt<GetMedicineDetails>(),
       ));
+  getIt.registerFactory(() => EmployeeBloc(getIt<EmployeeRepository>()));
 }

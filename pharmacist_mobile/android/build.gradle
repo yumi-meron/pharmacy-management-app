@@ -1,3 +1,25 @@
+ext {
+    compileSdkVersion = 33  // or 34, match your installed SDK
+}
+
+// buildscript {
+//     ext {
+//         compileSdkVersion = 33       // ✅ or 34, based on your installed SDK
+//         minSdkVersion = 21
+//         targetSdkVersion = 33
+//         kotlin_version = '1.9.10'    // or whatever version you're using
+//     }
+
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
+
+//     dependencies {
+//         classpath 'com.android.tools.build:gradle:8.1.1' // ✅ adjust if needed
+//     }
+// }
+
 allprojects {
     repositories {
         google()
@@ -16,3 +38,7 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+ext {
+    compileSdkVersion = 33
+}
+

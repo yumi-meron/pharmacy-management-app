@@ -25,3 +25,8 @@ class ForgotPasswordEvent extends AuthEvent {
   @override
   List<Object> get props => [email];
 }
+
+class AuthLoggedOut extends AuthEvent {
+  const AuthLoggedOut();
+  
+}
