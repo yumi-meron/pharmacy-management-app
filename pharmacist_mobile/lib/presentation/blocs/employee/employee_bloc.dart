@@ -15,21 +15,36 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
         (employees) => emit(EmployeeLoaded(employees)),
       );
     });
+
     on<AddEmployee>((event, emit) async {
-    emit(EmployeeLoading());
-    final result = await employeeRepository.addEmployee(
-      fullName: event.name,
-      phoneNumber: event.phoneNumber,
-      password: '12345678', // Default password
-      role: event.role,
-    );
+      emit(EmployeeLoading());
 
-    result.fold(
-      (failure) => emit(EmployeeError(failure.message)),
-      (_) => emit(EmployeeAddedSuccessfully()),
-    );
-  });
+      final addResult = await employeeRepository.addEmployee(
+        fullName: event.name,
+        phoneNumber: event.phoneNumber,
+        role: event.role,
+        password: event.password,
+      );
 
+      await addResult.fold(
+        (failure) async {
+          emit(EmployeeError(failure.message));
+          // Then immediately fetch the list again
+          final result = await employeeRepository.getAllEmployees();
+          result.fold(
+            (failure) => emit(EmployeeError(failure.message)),
+            (employees) => emit(EmployeeLoaded(employees)),
+          );
+        },
+        (successMessage) async {
+          emit(EmployeeAddedSuccessfully());
+          final result = await employeeRepository.getAllEmployees();
+          result.fold(
+            (failure) => emit(EmployeeError(failure.message)),
+            (employees) => emit(EmployeeLoaded(employees)),
+          );
+        },
+      );
+    });
   }
-  
 }

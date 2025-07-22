@@ -29,7 +29,6 @@ class EmployeeDataSourceImpl implements EmployeeDataSource {
     _httpClient = client ?? http.Client();
   }
 
-
   Future<Map<String, String>> _getHeaders() async {
     final token = _prefs.getString('token');
     final userJson = _prefs.getString('user');
@@ -62,13 +61,15 @@ class EmployeeDataSourceImpl implements EmployeeDataSource {
         'password': password,
         'role': role,
       });
+      // print(role);
 
       final response = await _httpClient.post(
         Uri.parse('${ApiConstants.baseUrl}/api/users/pharmacists'),
         headers: headers,
         body: body,
       );
-
+      // print('hiiiiiiiiiiiiiiiiiiiiii');
+      // print(response.body);
       if (response.statusCode == 201 || response.statusCode == 200) {
         return const Right(unit);
       } else {
@@ -83,7 +84,6 @@ class EmployeeDataSourceImpl implements EmployeeDataSource {
     }
   }
 
-
   @override
   Future<Either<Failure, List<User>>> fetchEmployees() async {
     try {
@@ -92,14 +92,13 @@ class EmployeeDataSourceImpl implements EmployeeDataSource {
         Uri.parse('${ApiConstants.baseUrl}/api/users/pharmacists'),
         headers: headers,
       );
-      print(response.body);
-      
+      // print(response.body);
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        final result = data
-            .map((json) => UserModel.fromJson(json).toEntity())
-            .toList();
-        print(result);
+        final result =
+            data.map((json) => UserModel.fromJson(json).toEntity()).toList();
+        // print(result);
         return Right(result);
       } else {
         return const Left(ServerFailure('Failed to load employees'));
