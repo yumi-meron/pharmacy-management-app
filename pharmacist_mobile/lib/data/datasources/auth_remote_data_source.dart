@@ -34,7 +34,7 @@ class RemoteDataSourceImpl extends AuthRemoteDataSource {
 
         // Save user as JSON
         await prefs.setString('user', jsonEncode(user.toJson()));
-        // print(user);
+        
         // Save the token
         final token = response.data['token'];
         if (token != null) {

@@ -7,6 +7,7 @@ import 'package:pharmacist_mobile/presentation/blocs/auth/auth_state.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_state.dart';
+import 'package:pharmacist_mobile/presentation/pages/cart_page.dart';
 import 'package:pharmacist_mobile/presentation/pages/inventory_page.dart';
 import 'package:pharmacist_mobile/presentation/pages/settings_page.dart';
 import 'package:pharmacist_mobile/presentation/widgets/medicine_card.dart';
@@ -53,7 +54,12 @@ class _HomePageState extends State<HomePage> {
                       const Spacer(),
                       IconButton(
                         icon: const Icon(Icons.shopping_cart),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) =>  CartPage()),
+                          );
+                        },
                       ),
                     ],
                   );
