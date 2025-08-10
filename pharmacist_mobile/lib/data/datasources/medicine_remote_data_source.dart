@@ -46,14 +46,12 @@ class MedicineRemoteDataSource {
         Uri.parse('${ApiConstants.baseUrl}/api/medicines'),
         headers: headers,
       );
-      // print(response.statusCode);
-      // print(response.body);
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         final result = data
             .map((json) => MedicineModel.fromJson(json).toEntity())
             .toList();
-        // print(result);
         return Right(result);
       } else {
         return const Left(ServerFailure('Failed to load all medicines'));

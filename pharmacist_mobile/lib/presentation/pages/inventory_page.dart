@@ -4,6 +4,7 @@ import 'package:pharmacist_mobile/core/di/injection.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_state.dart';
+import 'package:pharmacist_mobile/presentation/pages/cart_page.dart';
 import 'package:pharmacist_mobile/presentation/widgets/medicine_card.dart';
 import 'package:pharmacist_mobile/presentation/widgets/custom_bottom_navigation_bar.dart';
 
@@ -70,7 +71,10 @@ class _InventoryPageState extends State<InventoryPage> {
               child: IconButton(
                icon: const Icon(Icons.shopping_cart),
                 onPressed: () {
-                  // Handle notifications
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>  CartPage()),
+                  );
                 },
               ),
             ),

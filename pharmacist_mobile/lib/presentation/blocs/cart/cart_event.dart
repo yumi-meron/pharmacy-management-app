@@ -1,15 +1,19 @@
 abstract class CartEvent {}
 
-class AddItemToCart extends CartEvent {
-  final String itemId;
+class AddCartItemEvent extends CartEvent {
+  final String medicineVariantId;
+  final int quantity;
 
-  AddItemToCart(this.itemId);
+  AddCartItemEvent({required this.medicineVariantId, required this.quantity});
 }
+class LoadCart extends CartEvent {}
 
-class RemoveItemFromCart extends CartEvent {
-  final String itemId;
 
-  RemoveItemFromCart(this.itemId);
+class RemoveCartItemEvent extends CartEvent {
+  final String id;
+
+  RemoveCartItemEvent(this.id);
 }
+class CheckoutCartEvent extends CartEvent {}
 
 class ClearCart extends CartEvent {}

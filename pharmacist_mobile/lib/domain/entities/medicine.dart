@@ -14,7 +14,7 @@ class Medicine extends Equatable {
 
   const Medicine({
     required this.id,
-    required this.name,
+    required this./*  */name,
     required this.category,
     this.description,
     required this.createdAt,
