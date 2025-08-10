@@ -60,7 +60,8 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
         headers: headers,
         body: body,
       );
-
+      print(
+          'Response status bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb: ${response.body}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right(unit);
       } else {
@@ -81,10 +82,11 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
       final headers = await _getHeaders();
 
       final response = await _client.post(
-        Uri.parse('${ApiConstants.baseUrl}/api/sale'),
+        Uri.parse('${ApiConstants.baseUrl}/api/sales'),
         headers: headers,
       );
-
+      
+      print(response.statusCode);
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right(unit);
       } else {

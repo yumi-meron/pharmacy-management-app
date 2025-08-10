@@ -47,7 +47,7 @@ class CartPage extends StatelessWidget {
                         Text('Total : ${state.totalPrice} ETB'),
                         ElevatedButton(
                           onPressed: () {
-                            // Handle checkout
+                            getIt<CartBloc>().add(CheckoutCartEvent());
                           },
                           child: Text('Check Out'),
                         ),
