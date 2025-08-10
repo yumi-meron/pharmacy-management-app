@@ -8,7 +8,7 @@ class CartLoading extends CartState {}
 
 class CartLoaded extends CartState {
   final List<CartItem> items;
-  final int totalPrice;
+  final double totalPrice;
 
   CartLoaded({required this.items, required this.totalPrice});
 }

@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:pharmacist_mobile/core/network/network_info.dart';
+import 'package:pharmacist_mobile/domain/entities/cart_data_entity.dart';
 import '../../../core/error/failure.dart';
 import '../../domain/entities/cart_item.dart';
 import '../../domain/repositories/cart_repository.dart';
@@ -12,17 +13,16 @@ class CartRepositoryImpl implements CartRepository {
 
   CartRepositoryImpl(this.remote, this.networkInfo);
 
+ 
   @override
-  Future<Either<Failure, List<CartItem>>> getCartItems() async {
-    try {
-      final result = await remote.getCartItems();
-      return result.map(
-      (models) => models.map((model) => model.toEntity()).toList()
+  Future<Either<Failure, CartData>> getCartItems() async {
+    final result = await remote.getCartItems();
+    return result.fold(
+      (failure) => Left(failure),
+      (cartDataModel) => Right(cartDataModel), // already a CartData
     );
-    } catch (_) {
-      return Left(ServerFailure('Failed to fetch cart items'));
-    }
   }
+
 
   @override
   Future<Either<Failure, Unit>> addCartItem(String medicineVariantId, int quantity) async {

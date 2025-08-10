@@ -1,17 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:pharmacist_mobile/data/models/cart_data_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pharmacist_mobile/core/constants/api_constants.dart';
 import 'package:pharmacist_mobile/core/error/failure.dart';
 import 'package:dartz/dartz.dart';
-import '../models/cart_item_model.dart';
 import '../models/user_model.dart';
 
 abstract class CartRemoteDataSource {
-  Future<Either<Failure, List<CartItemModel>>> getCartItems();
+  Future<Either<Failure, CartDataModel>> getCartItems();
   Future<Either<Failure, Unit>> removeCartItem(String id);
-  Future<Either<Failure, Unit>> addCartItem(String medicineVariantId, int quantity);
+  Future<Either<Failure, Unit>> addCartItem(
+      String medicineVariantId, int quantity);
   Future<Either<Failure, Unit>> checkoutCart();
 }
 
@@ -45,7 +46,8 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, Unit>> addCartItem(String medicineVariantId, int quantity) async {
+  Future<Either<Failure, Unit>> addCartItem(
+      String medicineVariantId, int quantity) async {
     try {
       final headers = await _getHeaders();
       final body = json.encode({
@@ -63,7 +65,8 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
         return const Right(unit);
       } else {
         final decoded = json.decode(response.body);
-        return Left(ServerFailure(decoded['message'] ?? 'Failed to add item to cart'));
+        return Left(
+            ServerFailure(decoded['message'] ?? 'Failed to add item to cart'));
       }
     } on SocketException {
       return const Left(ConnectionFailure('Failed to connect to the network'));
@@ -86,7 +89,8 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
         return const Right(unit);
       } else {
         final decoded = json.decode(response.body);
-        return Left(ServerFailure(decoded['message'] ?? 'Failed to checkout cart'));
+        return Left(
+            ServerFailure(decoded['message'] ?? 'Failed to checkout cart'));
       }
     } on SocketException {
       return const Left(ConnectionFailure('Failed to connect to the network'));
@@ -96,7 +100,7 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, List<CartItemModel>>> getCartItems() async {
+  Future<Either<Failure, CartDataModel>> getCartItems() async {
     try {
       final headers = await _getHeaders();
 
@@ -107,9 +111,8 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
 
       if (response.statusCode == 200) {
         final decoded = json.decode(response.body);
-        final List items = decoded['items'] ?? [];
-        print('successfully fetched cart items: $items');
-        return Right(items.map((e) => CartItemModel.fromJson(e)).toList());
+        final cartData = CartDataModel.fromJson(decoded);
+        return Right(cartData);
       } else {
         return const Left(ServerFailure('Failed to fetch cart items'));
       }

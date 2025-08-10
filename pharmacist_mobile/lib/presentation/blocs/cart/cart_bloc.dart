@@ -14,17 +14,24 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
   CartBloc({required this.getCartItems, required this.removeCartItem, required this.addCartItem, required this.checkoutCart})
       : super(CartInitial()) {
+
+
     on<LoadCart>((event, emit) async {
       emit(CartLoading());
+
       final result = await getCartItems();
+
       result.fold(
         (failure) => emit(CartError("Failed to load cart")),
-        (items) {
-          final totalPrice = items.fold(0, (sum, e) => sum + e.price);
-          emit(CartLoaded(items: items, totalPrice: totalPrice));
+        (cartData) {
+          emit(CartLoaded(
+            items: cartData.items,
+            totalPrice: cartData.totalPrice,
+          ));
         },
       );
     });
+
 
   on<CheckoutCartEvent>((event, emit) async {
     emit(CartLoading());
@@ -44,10 +51,12 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         // After adding, reload cart
         final reloadResult = await getCartItems();
         reloadResult.fold(
-          (failure) => emit(CartError("Failed to reload cart")),
-          (items) {
-            final totalPrice = items.fold(0, (sum, e) => sum + e.price);
-            emit(CartLoaded(items: items, totalPrice: totalPrice));
+          (failure) => emit(CartError("Failed to load cart")),
+          (cartData) {
+            emit(CartLoaded(
+              items: cartData.items,
+              totalPrice: cartData.totalPrice,
+            ));
           },
         );
       },
@@ -63,7 +72,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           (failure) => emit(CartError("Failed to remove item")),
           (_) {
             final updatedItems = currentState.items.where((item) => item.id != event.id).toList();
-            final newTotal = updatedItems.fold(0, (sum, e) => sum + e.price);
+            final newTotal = updatedItems.fold(0.0, (sum, e) => sum + e.price);
             emit(CartLoaded(items: updatedItems, totalPrice: newTotal));
           },
         );
