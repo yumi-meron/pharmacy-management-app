@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pharmacist_mobile/data/models/cart_item_model.dart';
 import 'package:pharmacist_mobile/domain/entities/medicine_variant.dart';
+import 'package:pharmacist_mobile/presentation/blocs/cart/cart_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_state.dart';
 import 'package:pharmacist_mobile/core/di/injection.dart';
 import 'package:intl/intl.dart';
+import 'package:pharmacist_mobile/presentation/blocs/cart/cart_event.dart';
+
 
 class MedicineDetailPage extends StatefulWidget {
   final String medicineId;
@@ -22,9 +26,15 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<MedicineBloc>(
-      create: (context) => getIt<MedicineBloc>()
-        ..add(GetMedicineDetailsEvent(widget.medicineId)),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<MedicineBloc>(
+          create: (context) => getIt<MedicineBloc>()..add(GetMedicineDetailsEvent(widget.medicineId)),
+        ),
+        BlocProvider<CartBloc>(
+          create: (_) => getIt<CartBloc>(), // Or manually: CartBloc(cartRepository: ...)
+        ),
+      ],
       child: Scaffold(
         backgroundColor: Colors.white,
         body: BlocBuilder<MedicineBloc, MedicineState>(
@@ -310,12 +320,21 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    if (selectedVariant != null) {
+                    
+                    getIt<CartBloc>().add(AddCartItemEvent(medicineVariantId: selectedVariant!.id, quantity: quantity));
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Added to cart')),
+                    );
+                  }
+                },
                   child: const Text(
                     "Add to Cart",
                     style: TextStyle(
                       fontSize: 12, // Adjusted font size for smaller button
-                      color: Colors.white,
+                      color: Color.fromARGB(255, 26, 10, 10),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
