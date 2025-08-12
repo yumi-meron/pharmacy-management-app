@@ -71,7 +71,7 @@ Future<void> setup() async {
     EmployeeDataSourceImpl(prefs: getIt()),
   );
   getIt.registerSingleton<CartRemoteDataSource>(
-    CartRemoteDataSourceImpl(prefs: getIt()),
+    CartRemoteDataSourceImpl(dio: getIt(), prefs: getIt()),
   );
 
   // Repositories

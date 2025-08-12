@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pharmacist_mobile/domain/usecases/cart/add_cart_item.dart';
 import 'package:pharmacist_mobile/domain/usecases/cart/check_out.dart';
@@ -50,11 +52,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         emit(CartError("Failed to add item"));
         return;
       }
-      print('1');
 
       // Reload cart immediately, still inside handler
       final reloadResult = await getCartItems();
-      print('2');
       reloadResult.fold(
         (failure) => emit(CartError("Failed to load cart")),
         (cartData) {
@@ -64,7 +64,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           ));
         },
       );
-      print('3');
+      
     });
 
     on<RemoveCartItemEvent>((event, emit) async {

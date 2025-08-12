@@ -1,9 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 
 class CartItem extends Equatable {
   final String id; // medicine_variant_id
   final String name;
-  final int price;
+  final double price;
   final String unit;
   final String imageUrl;
 
