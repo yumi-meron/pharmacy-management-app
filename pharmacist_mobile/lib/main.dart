@@ -22,7 +22,38 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Pharmacy App',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF01C587),
+            primary: const Color(0xFF01C587),
+            secondary: const Color(0xFF26D191),
+            surface: Colors.white,
+            background: const Color(0xFFF5F5F5),
+            error: Colors.redAccent,
+            onPrimary: Colors.white,
+            onSecondary: Colors.white,
+            onSurface: Colors.black87,
+            onBackground: Colors.black87,
+            onError: Colors.white,
+            brightness: Brightness.light,
+          ),
+
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF01C587),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          inputDecorationTheme: const InputDecorationTheme(
+            border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF01C587)),
+            ),
+            labelStyle: TextStyle(color: Color(0xFF01C587)),
+          ),
           useMaterial3: true,
         ),
         home: const SignInPage(),

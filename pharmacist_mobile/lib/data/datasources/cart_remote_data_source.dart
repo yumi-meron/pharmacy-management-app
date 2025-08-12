@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:pharmacist_mobile/data/models/cart_data_model.dart';
+import 'package:dio/dio.dart';
+import 'package:dartz/dartz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:pharmacist_mobile/core/constants/api_constants.dart';
 import 'package:pharmacist_mobile/core/error/failure.dart';
-import 'package:dartz/dartz.dart';
-import '../models/user_model.dart';
+import 'package:pharmacist_mobile/data/models/cart_data_model.dart';
+import 'package:pharmacist_mobile/data/models/user_model.dart';
 
 abstract class CartRemoteDataSource {
   Future<Either<Failure, CartDataModel>> getCartItems();
@@ -17,31 +17,26 @@ abstract class CartRemoteDataSource {
 }
 
 class CartRemoteDataSourceImpl implements CartRemoteDataSource {
-  late final http.Client _client;
-  final SharedPreferences _prefs;
+  final Dio dio;
+  final SharedPreferences prefs;
 
-  CartRemoteDataSourceImpl({
-    http.Client? client,
-    required SharedPreferences prefs,
-  }) : _prefs = prefs {
-    _client = client ?? http.Client();
-  }
+  CartRemoteDataSourceImpl({required this.dio, required this.prefs});
 
-  Future<Map<String, String>> _getHeaders() async {
-    final token = _prefs.getString('token');
-    final userJson = _prefs.getString('user');
+  Future<Map<String, dynamic>> _getHeaders() async {
+    final token = prefs.getString('token');
+    final userJson = prefs.getString('user');
 
     if (token == null) throw Exception('No token found');
     if (userJson == null) throw Exception('No user data found');
 
-    final userMap = jsonDecode(userJson);
-    final user = UserModel.fromJson(userMap);
+    final user = UserModel.fromJson(jsonDecode(userJson));
 
     return {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
       'role': user.role,
       'pharmacy_id': user.pharmacyId.toString(),
+      'user_id': user.id.toString(),
     };
   }
 
@@ -50,27 +45,23 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
       String medicineVariantId, int quantity) async {
     try {
       final headers = await _getHeaders();
-      final body = json.encode({
-        'medicine_variant_id': medicineVariantId,
-        'quantity': quantity,
-      });
-
-      final response = await _client.post(
-        Uri.parse('${ApiConstants.baseUrl}/api/cart'),
-        headers: headers,
-        body: body,
+      final response = await dio.post(
+        '${ApiConstants.baseUrl}/api/carts',
+        data: {
+          'medicine_variant_id': medicineVariantId,
+          'quantity': quantity,
+        },
+        options: Options(headers: headers, followRedirects: true),
       );
-      print(
-          'Response status bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb: ${response.body}');
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right(unit);
       } else {
-        final decoded = json.decode(response.body);
-        return Left(
-            ServerFailure(decoded['message'] ?? 'Failed to add item to cart'));
+        return Left(ServerFailure(
+            response.data['message'] ?? 'Failed to add item to cart'));
       }
-    } on SocketException {
-      return const Left(ConnectionFailure('Failed to connect to the network'));
+    } on DioException catch (e) {
+      return Left(ServerFailure(_getErrorMessage(e)));
     } catch (e) {
       return Left(ServerFailure('Unexpected error: ${e.toString()}'));
     }
@@ -80,22 +71,19 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
   Future<Either<Failure, Unit>> checkoutCart() async {
     try {
       final headers = await _getHeaders();
-
-      final response = await _client.post(
-        Uri.parse('${ApiConstants.baseUrl}/api/sales'),
-        headers: headers,
+      final response = await dio.post(
+        '${ApiConstants.baseUrl}/api/sale',
+        options: Options(headers: headers, followRedirects: true),
       );
-      
-      print(response.statusCode);
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right(unit);
       } else {
-        final decoded = json.decode(response.body);
-        return Left(
-            ServerFailure(decoded['message'] ?? 'Failed to checkout cart'));
+        return Left(ServerFailure(
+            response.data['message'] ?? 'Failed to checkout cart'));
       }
-    } on SocketException {
-      return const Left(ConnectionFailure('Failed to connect to the network'));
+    } on DioException catch (e) {
+      return Left(ServerFailure(_getErrorMessage(e)));
     } catch (e) {
       return Left(ServerFailure('Unexpected error: ${e.toString()}'));
     }
@@ -105,21 +93,19 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
   Future<Either<Failure, CartDataModel>> getCartItems() async {
     try {
       final headers = await _getHeaders();
-
-      final response = await _client.get(
-        Uri.parse('${ApiConstants.baseUrl}/api/cart'),
-        headers: headers,
+      final response = await dio.get(
+        '${ApiConstants.baseUrl}/api/carts',
+        options: Options(headers: headers, followRedirects: true),
       );
-
+      // print('sdcfvghnjmk,lxcvbnm?${response.statusCode}');
       if (response.statusCode == 200) {
-        final decoded = json.decode(response.body);
-        final cartData = CartDataModel.fromJson(decoded);
+        final cartData = CartDataModel.fromJson(response.data);
         return Right(cartData);
       } else {
         return const Left(ServerFailure('Failed to fetch cart items'));
       }
-    } on SocketException {
-      return const Left(ConnectionFailure('Failed to connect to the network'));
+    } on DioException catch (e) {
+      return Left(ServerFailure(_getErrorMessage(e)));
     } catch (e) {
       return Left(ServerFailure('Unexpected error: ${e.toString()}'));
     }
@@ -129,10 +115,9 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
   Future<Either<Failure, Unit>> removeCartItem(String id) async {
     try {
       final headers = await _getHeaders();
-
-      final response = await _client.delete(
-        Uri.parse('${ApiConstants.baseUrl}/api/cart/$id'),
-        headers: headers,
+      final response = await dio.delete(
+        '${ApiConstants.baseUrl}/api/cart/$id',
+        options: Options(headers: headers, followRedirects: true),
       );
 
       if (response.statusCode == 200) {
@@ -140,10 +125,19 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
       } else {
         return const Left(ServerFailure('Failed to remove item from cart'));
       }
-    } on SocketException {
-      return const Left(ConnectionFailure('Failed to connect to the network'));
+    } on DioException catch (e) {
+      return Left(ServerFailure(_getErrorMessage(e)));
     } catch (e) {
       return Left(ServerFailure('Unexpected error: ${e.toString()}'));
     }
+  }
+
+  String _getErrorMessage(DioException e) {
+    if (e.response != null &&
+        e.response?.data is Map &&
+        e.response?.data['message'] != null) {
+      return e.response?.data['message'];
+    }
+    return e.message ?? 'Unknown error';
   }
 }

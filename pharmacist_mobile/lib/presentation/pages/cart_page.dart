@@ -12,10 +12,17 @@ class CartPage extends StatelessWidget {
     return BlocProvider(
       create: (_) => getIt<CartBloc>()..add(LoadCart()),
       child: Scaffold(
-        appBar: AppBar(title: Text("Your cart")),
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            "Your cart",
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
         body: BlocBuilder<CartBloc, CartState>(
           builder: (context, state) {
-            if (state is CartLoading) return Center(child: CircularProgressIndicator());
+            if (state is CartLoading)
+              return Center(child: CircularProgressIndicator());
             if (state is CartError) return Center(child: Text(state.message));
             if (state is CartLoaded) {
               return Column(
@@ -25,16 +32,76 @@ class CartPage extends StatelessWidget {
                       itemCount: state.items.length,
                       itemBuilder: (context, index) {
                         final item = state.items[index];
-                        return ListTile(
-                          leading: Image.network(item.imageUrl),
-                          title: Text(item.name),
-                          subtitle: Text('${item.unit} — ${item.price} ETB'),
-                          trailing: IconButton(
-                            icon: Icon(Icons.close),
-                            onPressed: () {
-                              context.read<CartBloc>().add(RemoveCartItemEvent(item.id));
-                            },
-                          ),
+                        return Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                      color: Colors.grey.shade300, width: 1),
+                                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 16),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(5),
+                                    child: SizedBox(
+                                      width: 60,
+                                      height: 60,
+                                      child: Image.network(
+                                        item.imageUrl,
+                                        fit: BoxFit.cover,
+                                        height: 60,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.name,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge
+                                              ?.copyWith(
+                                                  fontWeight: FontWeight.w600),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text('${item.unit}'),
+                                        SizedBox(height: 2),
+                                        Text('${item.price} ETB'),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.grey),
+                                    ),
+                                    child: IconButton(
+                                      icon: Icon(Icons.close, size: 14),
+                                      padding: EdgeInsets.zero,
+                                      constraints: BoxConstraints(),
+                                      onPressed: () {
+                                        context
+                                            .read<CartBloc>()
+                                            .add(RemoveCartItemEvent(item.id));
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 8), // Gap between items
+                          ],
                         );
                       },
                     ),
@@ -44,17 +111,43 @@ class CartPage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Total : ${state.totalPrice} ETB'),
-                        ElevatedButton(
-                          onPressed: () {
+                        RichText(
+                          text: TextSpan(
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            children: [
+                              TextSpan(text: 'Total : '),
+                              TextSpan(
+                                text: '${state.totalPrice} ETB',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF01C587),
+                            minimumSize: Size(160, 40),
+                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20), // Increased border radius
+                            ),
+                            ),
+                            onPressed: () {
                             getIt<CartBloc>().add(CheckoutCartEvent());
-                          },
-                          child: Text('Check Out'),
+                            },
+                            label: Text(
+                            'Check Out',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            ),
+                          ),
+                          ],
+                        ),
                         ),
                       ],
-                    ),
-                  ),
-                ],
               );
             }
             return SizedBox();
