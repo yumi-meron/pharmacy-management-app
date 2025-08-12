@@ -21,3 +21,4 @@ class CartError extends CartState {
   CartError(this.message);
 }
 class CartCheckoutSuccess extends CartState {}
+class CartCheckoutLoading extends CartState {}
