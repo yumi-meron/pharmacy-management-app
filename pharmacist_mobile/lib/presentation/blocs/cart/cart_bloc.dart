@@ -37,7 +37,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     });
 
     on<CheckoutCartEvent>((event, emit) async {
-      emit(CartLoading());
+      emit(CartCheckoutLoading());
       final result = await checkoutCart();
       result.fold(
         (failure) => emit(CartError("Failed to checkout cart")),
@@ -79,6 +79,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
                 .toList();
             final newTotal = updatedItems.fold(0.0, (sum, e) => sum + e.price);
             emit(CartLoaded(items: updatedItems, totalPrice: newTotal));
+            
           },
         );
       }

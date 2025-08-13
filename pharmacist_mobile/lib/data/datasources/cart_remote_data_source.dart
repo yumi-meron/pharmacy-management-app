@@ -72,9 +72,10 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
     try {
       final headers = await _getHeaders();
       final response = await dio.post(
-        '${ApiConstants.baseUrl}/api/sale',
+        '${ApiConstants.baseUrl}/api/sales',
         options: Options(headers: headers, followRedirects: true),
       );
+      print('Checkout response: ${response.statusCode}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right(unit);
@@ -97,7 +98,6 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
         '${ApiConstants.baseUrl}/api/carts',
         options: Options(headers: headers, followRedirects: true),
       );
-      // print('sdcfvghnjmk,lxcvbnm?${response.statusCode}');
       if (response.statusCode == 200) {
         final cartData = CartDataModel.fromJson(response.data);
         return Right(cartData);
@@ -115,10 +115,13 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
   Future<Either<Failure, Unit>> removeCartItem(String id) async {
     try {
       final headers = await _getHeaders();
+      print('before delete request');
       final response = await dio.delete(
         '${ApiConstants.baseUrl}/api/cart/$id',
         options: Options(headers: headers, followRedirects: true),
       );
+      print('Remove item response: ${response.statusCode}');
+
 
       if (response.statusCode == 200) {
         return const Right(unit);

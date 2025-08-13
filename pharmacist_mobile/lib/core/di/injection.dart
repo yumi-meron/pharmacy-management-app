@@ -9,6 +9,7 @@ import 'package:pharmacist_mobile/data/datasources/auth_remote_data_source.dart'
 import 'package:pharmacist_mobile/data/datasources/employee_remote_datasource.dart';
 import 'package:pharmacist_mobile/data/datasources/medicine_remote_data_source.dart';
 import 'package:pharmacist_mobile/data/datasources/cart_remote_data_source.dart';
+import 'package:pharmacist_mobile/data/datasources/orders_remote_data_source.dart';
 
 
 // Repositories
@@ -16,13 +17,19 @@ import 'package:pharmacist_mobile/data/repositories/auth_repository_impl.dart';
 import 'package:pharmacist_mobile/data/repositories/employee_repository_impl.dart';
 import 'package:pharmacist_mobile/data/repositories/medicine_repository_impl.dart';
 import 'package:pharmacist_mobile/data/repositories/cart_repository_impl.dart';
+import 'package:pharmacist_mobile/data/repositories/orders_repository_impl.dart';
 
 // Domain
 import 'package:pharmacist_mobile/domain/repositories/auth_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/employee_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/medicine_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/cart_repository.dart';
-
+import 'package:pharmacist_mobile/domain/repositories/orders_repository.dart';
+import 'package:pharmacist_mobile/domain/usecases/orders/get_orders.dart';
+import 'package:pharmacist_mobile/domain/usecases/orders/get_order_detail.dart';
+import 'package:pharmacist_mobile/domain/usecases/orders/request_order_otp.dart';
+import 'package:pharmacist_mobile/domain/usecases/orders/verify_order_otp.dart';
+ 
 // Auth Usecases
 import 'package:pharmacist_mobile/domain/usecases/auth/sign_in.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/forgot_password.dart';
@@ -42,6 +49,7 @@ import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/employee/employee_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/cart/cart_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/orders_bloc.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -73,6 +81,9 @@ Future<void> setup() async {
   getIt.registerSingleton<CartRemoteDataSource>(
     CartRemoteDataSourceImpl(dio: getIt(), prefs: getIt()),
   );
+  getIt.registerSingleton<OrdersRemoteDataSource>(
+    OrdersRemoteDataSourceImpl(prefs: getIt(), client: getIt()),
+  );
 
   // Repositories
   getIt.registerSingleton<AuthRepository>(
@@ -87,11 +98,19 @@ Future<void> setup() async {
   getIt.registerSingleton<CartRepository>(
     CartRepositoryImpl(getIt(), getIt()),
   );
+  getIt.registerSingleton<OrdersRepository>(
+    OrdersRepositoryImpl(remote: getIt()),
+  );
 
   // Use Cases
   getIt.registerSingleton<SignIn>(SignIn(getIt()));
   getIt.registerSingleton<ForgotPassword>(ForgotPassword(getIt()));
   getIt.registerLazySingleton(() => GetMedicineDetails(getIt()));
+  // orders use cases
+  getIt.registerLazySingleton(() => GetOrders(getIt()));
+  getIt.registerLazySingleton(() => GetOrderDetail(getIt()));
+  getIt.registerLazySingleton(() => RequestOrderOtp(getIt()));
+  getIt.registerLazySingleton(() => VerifyOrderOtp(getIt()));
 
   // Cart Use Cases
   getIt.registerLazySingleton(() => GetCartItems(getIt()));
@@ -115,5 +134,11 @@ Future<void> setup() async {
         removeCartItem: getIt(),
         addCartItem: getIt(),
         checkoutCart: getIt(),
+      ));
+  getIt.registerFactory(() => OrdersBloc(
+        getOrders: getIt(),
+        getOrderDetail: getIt(),
+        requestOrderOtp: getIt(),
+        verifyOrderOtp: getIt(),
       ));
 }

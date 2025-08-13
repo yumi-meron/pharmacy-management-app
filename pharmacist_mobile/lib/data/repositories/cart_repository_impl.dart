@@ -17,10 +17,10 @@ class CartRepositoryImpl implements CartRepository {
   @override
   Future<Either<Failure, CartData>> getCartItems() async {
     final result = await remote.getCartItems();
-    print('getCartItems result: $result');
+
     return result.fold(
       (failure) => Left(failure),
-      (cartDataModel) => Right(cartDataModel), // already a CartData
+      (cartDataModel) => Right(cartDataModel), 
     );
   }
 
