@@ -15,9 +15,10 @@ class CartDataModel extends CartData {
     //     .map((e) => CartItemModel.fromJson(e));
     // print('asdfghnjmk,$items');
     return CartDataModel(
-      items: (json['items'] as List)
-        .map((e) => CartItemModel.fromJson(e)).toList(),
-      totalPrice: (json['total_price'] as num).toDouble(),
+      items: (json['items'] as List? ?? [])
+          .map((e) => CartItemModel.fromJson(e))
+          .toList(),
+      totalPrice: (json['total_price'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

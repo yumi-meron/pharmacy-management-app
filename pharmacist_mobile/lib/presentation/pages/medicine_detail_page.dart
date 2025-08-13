@@ -10,7 +10,6 @@ import 'package:pharmacist_mobile/core/di/injection.dart';
 import 'package:intl/intl.dart';
 import 'package:pharmacist_mobile/presentation/blocs/cart/cart_event.dart';
 
-
 class MedicineDetailPage extends StatefulWidget {
   final String medicineId;
 
@@ -29,10 +28,13 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<MedicineBloc>(
-          create: (context) => getIt<MedicineBloc>()..add(GetMedicineDetailsEvent(widget.medicineId)),
+          create: (context) =>
+              getIt<MedicineBloc>()
+                ..add(GetMedicineDetailsEvent(widget.medicineId)),
         ),
         BlocProvider<CartBloc>(
-          create: (_) => getIt<CartBloc>(), // Or manually: CartBloc(cartRepository: ...)
+          create: (_) =>
+              getIt<CartBloc>(), // Or manually: CartBloc(cartRepository: ...)
         ),
       ],
       child: Scaffold(
@@ -75,8 +77,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                           padding: const EdgeInsets.all(20),
                           decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(24)),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(24),
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,17 +92,24 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                   Text(
                                     medicine.name,
                                     style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   Container(
                                     height: 35,
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
+                                      horizontal: 10,
+                                    ),
                                     decoration: BoxDecoration(
                                       border: Border.all(
-                                          color: const Color.fromARGB(
-                                              255, 238, 238, 238)),
+                                        color: const Color.fromARGB(
+                                          255,
+                                          238,
+                                          238,
+                                          238,
+                                        ),
+                                      ),
                                       borderRadius: BorderRadius.circular(100),
                                     ),
                                     child: DropdownButton<String>(
@@ -107,19 +117,26 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                       underline:
                                           const SizedBox(), // Remove default underline
                                       items: medicine.variants
-                                          .map((variant) =>
-                                              DropdownMenuItem<String>(
-                                                value: variant.unit,
-                                                child: Text('${variant.unit}',
+                                          .map(
+                                            (variant) =>
+                                                DropdownMenuItem<String>(
+                                                  value: variant.unit,
+                                                  child: Text(
+                                                    '${variant.unit}',
                                                     style: const TextStyle(
-                                                        fontSize: 12)),
-                                              ))
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                          )
                                           .toList(),
                                       onChanged: (value) {
                                         setState(() {
                                           selectedVariant = medicine.variants
-                                              .firstWhere((variant) =>
-                                                  variant.unit == value);
+                                              .firstWhere(
+                                                (variant) =>
+                                                    variant.unit == value,
+                                              );
                                         });
                                       },
                                     ),
@@ -133,23 +150,33 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: const Color.fromARGB(
-                                          255, 238, 238, 238)),
+                                    color: const Color.fromARGB(
+                                      255,
+                                      238,
+                                      238,
+                                      238,
+                                    ),
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    infoTile('Stock Quantity',
-                                        '${selectedVariant?.quantityAvailable ?? 0} units'),
-                                    infoTile('Price',
-                                        '${selectedVariant?.pricePerUnit ?? 0} Birr'),
+                                    infoTile(
+                                      'Stock Quantity',
+                                      '${selectedVariant?.quantityAvailable ?? 0} units',
+                                    ),
+                                    infoTile(
+                                      'Price',
+                                      '${selectedVariant?.pricePerUnit ?? 0} Birr',
+                                    ),
                                     infoTile(
                                       'Expiry Date',
                                       selectedVariant != null
                                           ? DateFormat('MMM dd, yyyy').format(
-                                              selectedVariant!.expiryDate)
+                                              selectedVariant!.expiryDate,
+                                            )
                                           : 'N/A',
                                     ),
                                   ],
@@ -165,8 +192,13 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                        color: const Color.fromARGB(
-                                            255, 238, 238, 238)),
+                                      color: const Color.fromARGB(
+                                        255,
+                                        238,
+                                        238,
+                                        238,
+                                      ),
+                                    ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Column(
@@ -187,8 +219,13 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: const Color.fromARGB(
-                                          255, 238, 238, 238)),
+                                    color: const Color.fromARGB(
+                                      255,
+                                      238,
+                                      238,
+                                      238,
+                                    ),
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Column(
@@ -249,9 +286,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        context
-                            .read<MedicineBloc>()
-                            .add(GetMedicineDetailsEvent(widget.medicineId));
+                        context.read<MedicineBloc>().add(
+                          GetMedicineDetailsEvent(widget.medicineId),
+                        );
                       },
                       child: const Text("Retry"),
                     ),
@@ -322,19 +359,23 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                   ),
                   onPressed: () {
                     if (selectedVariant != null) {
-                    
-                    getIt<CartBloc>().add(AddCartItemEvent(medicineVariantId: selectedVariant!.id, quantity: quantity));
+                      getIt<CartBloc>().add(
+                        AddCartItemEvent(
+                          medicineVariantId: selectedVariant!.id,
+                          quantity: quantity,
+                        ),
+                      );
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Added to cart')),
-                    );
-                  }
-                },
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Added to cart')),
+                      );
+                    }
+                  },
                   child: const Text(
                     "Add to Cart",
                     style: TextStyle(
                       fontSize: 12, // Adjusted font size for smaller button
-                      color: Color.fromARGB(255, 26, 10, 10),
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -375,31 +416,32 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
   }
 
   Widget sectionTitle(String title) => Text(
-        title,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-      );
+    title,
+    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+  );
 
   Widget sectionText(String text) => Text(
-        text,
-        style:
-            const TextStyle(fontSize: 14, color: Colors.black87, height: 1.4),
-      );
+    text,
+    style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.4),
+  );
 
   Widget sectionTextBullet(List<String> items) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: items
-            .map((item) => Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("• ", style: TextStyle(fontSize: 18)),
-                      Expanded(
-                          child:
-                              Text(item, style: const TextStyle(fontSize: 14))),
-                    ],
-                  ),
-                ))
-            .toList(),
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: items
+        .map(
+          (item) => Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("• ", style: TextStyle(fontSize: 18)),
+                Expanded(
+                  child: Text(item, style: const TextStyle(fontSize: 14)),
+                ),
+              ],
+            ),
+          ),
+        )
+        .toList(),
+  );
 }

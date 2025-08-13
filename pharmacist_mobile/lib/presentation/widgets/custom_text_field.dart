@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 class CustomTextField extends StatefulWidget {
   final String label;
   final TextEditingController controller;
+  final TextInputType? keyboardType;
   final bool obscureText;
-  final TextInputType keyboardType;
 
   const CustomTextField({
+    Key? key,
     required this.label,
-    super.key,
     required this.controller,
+    this.keyboardType,
     this.obscureText = false,
-    this.keyboardType = TextInputType.text,
-  });
+  }) : super(key: key);
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -24,54 +24,43 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   void initState() {
     super.initState();
-    _isObscured = widget.obscureText; // Initialize with the provided obscureText value
-  }
-
-  void _toggleVisibility() {
-    setState(() {
-      _isObscured = !_isObscured; // Toggle the visibility state
-    });
+    _isObscured = widget.obscureText;
   }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: widget.controller,
-      obscureText: _isObscured,
       keyboardType: widget.keyboardType,
+      obscureText: _isObscured,
+      style: const TextStyle(fontSize: 14.0),
       decoration: InputDecoration(
         labelText: widget.label,
-        labelStyle: TextStyle(
-          color: Colors.grey[400], // Light gray for label
-        ),
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        labelStyle: TextStyle(color: Colors.grey[400], fontSize: 12.0),
         border: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.grey[300]!, // Very light gray for border
-            width: 1.0,
-          ),
-          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+          borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          borderRadius: BorderRadius.circular(12.0),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.grey[300]!, // Very light gray for enabled border
-            width: 1.0,
-          ),
-          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+          borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          borderRadius: BorderRadius.circular(12.0),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.grey[300]!, // Slightly darker light gray for focused border
-            width: 1.5,
-          ),
-          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+          borderSide: BorderSide(color: Colors.grey[300]!, width: 1.5),
+          borderRadius: BorderRadius.circular(12.0),
         ),
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(
-                  _isObscured ? Icons.visibility : Icons.visibility_off,
-                  color: Colors.grey[400], // Light gray for eye icon
+                  _isObscured ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.grey[400],
                 ),
-                onPressed: _toggleVisibility,
+                onPressed: () {
+                  setState(() {
+                    _isObscured = !_isObscured;
+                  });
+                },
               )
             : null,
       ),

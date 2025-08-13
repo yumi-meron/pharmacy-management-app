@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
 import 'package:pharmacist_mobile/presentation/pages/sign_in_page.dart';
-import 'package:pharmacist_mobile/core/di/injection.dart'; 
+import 'package:pharmacist_mobile/core/di/injection.dart';
 
 void main() async {
   // debugPaintSizeEnabled = true;
@@ -36,13 +36,24 @@ class MyApp extends StatelessWidget {
             onError: Colors.white,
             brightness: Brightness.light,
           ),
-
+          textTheme: ThemeData.light().textTheme
+              .apply(fontFamily: 'Poppins')
+              .copyWith(
+                bodyLarge: const TextStyle(fontWeight: FontWeight.w500),
+                bodyMedium: const TextStyle(fontWeight: FontWeight.w500),
+                headlineLarge: const TextStyle(fontWeight: FontWeight.w500),
+                headlineMedium: const TextStyle(fontWeight: FontWeight.w500),
+                headlineSmall: const TextStyle(fontWeight: FontWeight.w500),
+                titleLarge: const TextStyle(fontWeight: FontWeight.w500),
+                titleMedium: const TextStyle(fontWeight: FontWeight.w500),
+                titleSmall: const TextStyle(fontWeight: FontWeight.w500),
+              ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF01C587),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
               textStyle: const TextStyle(fontWeight: FontWeight.bold),
             ),

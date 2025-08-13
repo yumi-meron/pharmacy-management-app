@@ -13,8 +13,9 @@ class MedicineWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final variant =
-        medicine.variants.isNotEmpty ? medicine.variants.first : null;
+    final variant = medicine.variants.isNotEmpty
+        ? medicine.variants.first
+        : null;
 
     return GestureDetector(
       onTap: () {
@@ -33,11 +34,17 @@ class MedicineWidget extends StatelessWidget {
         );
       },
       child: SizedBox(
-        width: 140, // was 160
+        width: 150,
         child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 2,
+          color: Colors.white, // Set the background color to white
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(
+              color: Color(0xFFD3D3D3), // Light grey border
+              width: 1.0,
+            ),
+          ),
+          elevation: 0, // Remove shadow
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,17 +76,22 @@ class MedicineWidget extends StatelessWidget {
                     Text(
                       medicine.name,
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 13),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${variant?.quantityAvailable ?? 0} ${variant?.unit ?? ''}',
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 11),
+                          '${variant?.unit ?? ''}',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 11,
+                          ),
                         ),
+
                         Row(
                           children: [
                             Icon(
@@ -105,11 +117,13 @@ class MedicineWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 8),
                     Text(
-                      '${variant.pricePerUnit.toStringAsFixed(0)} ETB / ${variant.unit}',
+                      '${variant.pricePerUnit.toStringAsFixed(0)} ETB',
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 13),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
