@@ -9,10 +9,10 @@ import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_event.dar
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_state.dart';
 import 'package:pharmacist_mobile/presentation/pages/cart_page.dart';
 import 'package:pharmacist_mobile/presentation/pages/inventory_page.dart';
+import 'package:pharmacist_mobile/presentation/pages/orders_list_page.dart';
 import 'package:pharmacist_mobile/presentation/pages/settings_page.dart';
 import 'package:pharmacist_mobile/presentation/widgets/medicine_card.dart';
 import 'package:pharmacist_mobile/presentation/widgets/custom_bottom_navigation_bar.dart';
-import 'package:pharmacist_mobile/presentation/widgets/pages.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -340,7 +340,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       const InventoryPage(),
-                      const OrdersPage(),
+                      const OrdersListPage(),
                       const SettingsPage(),
                     ],
                   );

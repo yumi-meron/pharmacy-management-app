@@ -10,7 +10,7 @@ class CartItemModel extends CartItem {
   });
 
   factory CartItemModel.fromJson(Map<String, dynamic> json) {
-    print('CartItemModel.fromJson: $json');
+
     return CartItemModel(
       id: json['id'],
       name: json['medicine_name'],
