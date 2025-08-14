@@ -11,7 +11,10 @@ class CartDataModel extends CartData {
     
     return CartDataModel(
       items: (json['items'] as List? ?? [])
-      .map((e) => CartItemModel.fromJson(e)).toList(),
+
+          .map((e) => CartItemModel.fromJson(e))
+          .toList(),
+
       totalPrice: (json['total_price'] as num?)?.toDouble() ?? 0.0,
     );
   }
