@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:pharmacist_mobile/domain/entities/order.dart';
-import 'package:pharmacist_mobile/domain/entities/order_detail.dart';
 
 abstract class OrdersState extends Equatable {
   const OrdersState();
@@ -21,25 +20,8 @@ class OrdersLoaded extends OrdersState {
   List<Object?> get props => [orders];
 }
 
-class OrderDetailLoading extends OrdersState {}
 
-class OrderDetailLoaded extends OrdersState {
-  final OrderDetail detail;
-  const OrderDetailLoaded(this.detail);
 
-  @override
-  List<Object?> get props => [detail];
-}
-class OrderDetailError extends OrdersState {
-  final String message;
-  const OrderDetailError(this.message);
-
-  @override
-  List<Object?> get props => [message];
-}
-class OtpRequestSuccess extends OrdersState {}
-
-class OtpVerifySuccess extends OrdersState {}
 
 class OrdersError extends OrdersState {
   final String message;

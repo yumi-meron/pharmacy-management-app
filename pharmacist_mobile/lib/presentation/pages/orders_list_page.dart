@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pharmacist_mobile/core/di/injection.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/orders_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/orders_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/orders_state.dart';
@@ -46,7 +45,7 @@ class _OrdersListPageState extends State<OrdersListPage> {
                   subtitle: Text(
                     'Date: ${order.orderDate} ',
                   ),
-                  trailing: Text(order.status ?? '',
+                  trailing: Text(order.status ,
                       style: TextStyle(
                         color: order.status == 'confirmed'
                             ? Colors.green

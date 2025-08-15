@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 // import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detail_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/orders_bloc.dart';
 import 'package:pharmacist_mobile/presentation/pages/sign_in_page.dart';
 import 'package:pharmacist_mobile/core/di/injection.dart';
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => getIt<AuthBloc>()),
         BlocProvider(create: (_) => getIt<OrdersBloc>()),
+        BlocProvider(create: (_) => getIt<OrderDetailBloc>()),
       ],
       child: MaterialApp(
         title: 'Pharmacy App',

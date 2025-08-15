@@ -19,7 +19,6 @@ class OrdersRepositoryImpl implements OrdersRepository {
   @override
   Future<Either<Failure, OrderDetail>> getOrderDetail(String id) async {
     final result = await remote.getOrderDetail(id); // Either<Failure, OrderDetailModel>
-    print('getOrderDetail result on Repository: $result');
     return result.map((model) => model.toEntity());
   }
 

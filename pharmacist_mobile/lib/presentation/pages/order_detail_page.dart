@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pharmacist_mobile/presentation/blocs/orders/orders_bloc.dart';
-import 'package:pharmacist_mobile/presentation/blocs/orders/orders_event.dart';
-import 'package:pharmacist_mobile/presentation/blocs/orders/orders_state.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detail_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detail_state.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detain_event.dart';
+import 'package:pinput/pinput.dart';
 
 class OrderDetailPage extends StatefulWidget {
   final String orderId;
@@ -16,7 +17,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   @override
   void initState() {
     super.initState();
-    context.read<OrdersBloc>().add(LoadOrderDetailEvent(widget.orderId));
+    context.read<OrderDetailBloc>().add(LoadOrderDetailEvent(widget.orderId));
   }
 
   Widget _buildPatientCard(order) {
@@ -118,7 +119,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
-                  // send OTP to patient
+                  // send OTP to patient then open confirmation sheet
+                  showOtpConfirmationSheet(context);
                 },
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -133,7 +135,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
-                  // send OTP to emergency contact
+                  // send OTP to emergency contact then open confirmation sheet
+                  showOtpConfirmationSheet(context);
                 },
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -145,7 +148,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               ),
             ),
           ],
-        ),
+        )
       ],
     );
   }
@@ -191,7 +194,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Order Detail')),
-      body: BlocBuilder<OrdersBloc, OrdersState>(
+      body: BlocBuilder<OrderDetailBloc, OrderDetailState>(
         builder: (context, state) {
           if (state is OrderDetailLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -219,4 +222,98 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       ),
     );
   }
+}
+
+void showOtpConfirmationSheet(BuildContext context) {
+  final otpController = TextEditingController();
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (context) {
+      final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+
+      return Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: bottomPadding + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "OTP Confirmation",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            // OTP Input (using pinput or manual)
+            Pinput(
+              length: 6,
+              controller: otpController,
+              defaultPinTheme: PinTheme(
+                width: 50,
+                height: 50,
+                textStyle: const TextStyle(fontSize: 20),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Didn't receive it yet? "),
+                GestureDetector(
+                  onTap: () {
+                    // resend OTP
+                  },
+                  child: const Text(
+                    "Send OTP Again",
+                    style: TextStyle(color: Colors.teal, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Cancel"),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      final otp = otpController.text.trim();
+                      if (otp.length == 6) {
+                        // TODO: verify OTP via bloc
+                        // context.read<OrderDetailBloc>().add(VerifyOtpEvent(otp));
+                        // Close the sheet after verification
+
+                        Navigator.pop(context);
+                      }
+                    },
+                    icon: const Icon(Icons.check),
+                    label: const Text("Confirm"),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

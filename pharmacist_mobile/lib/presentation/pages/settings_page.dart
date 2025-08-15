@@ -178,7 +178,7 @@ class SettingsPage extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      user.picture ?? '',
+                      user.picture ,
                       width: 70,
                       height: 70,
                       fit: BoxFit.cover,
@@ -206,7 +206,7 @@ class SettingsPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          user.phoneNumber ?? '',
+                          user.phoneNumber,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.black45,
@@ -292,7 +292,7 @@ class SettingsPage extends StatelessWidget {
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(16),
                               child: Image.network(
-                                employee.picture ?? '',
+                                employee.picture ,
                                 width: 40,
                                 height: 40,
                                 fit: BoxFit.cover,
@@ -375,7 +375,7 @@ class SettingsPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          user.phoneNumber ?? '',
+                          user.phoneNumber ,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.black45,
