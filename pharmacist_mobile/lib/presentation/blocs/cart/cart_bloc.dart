@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pharmacist_mobile/domain/usecases/cart/add_cart_item.dart';
 import 'package:pharmacist_mobile/domain/usecases/cart/check_out.dart';

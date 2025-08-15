@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:pharmacist_mobile/domain/entities/cart_item.dart';
 
 abstract class CartState {}

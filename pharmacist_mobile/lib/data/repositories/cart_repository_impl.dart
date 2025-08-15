@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:pharmacist_mobile/core/network/network_info.dart';
 import 'package:pharmacist_mobile/domain/entities/cart_data_entity.dart';
 import '../../../core/error/failure.dart';
-import '../../domain/entities/cart_item.dart';
 import '../../domain/repositories/cart_repository.dart';
 import '../datasources/cart_remote_data_source.dart';
 

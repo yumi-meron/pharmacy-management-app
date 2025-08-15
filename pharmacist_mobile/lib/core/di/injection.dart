@@ -11,7 +11,6 @@ import 'package:pharmacist_mobile/data/datasources/medicine_remote_data_source.d
 import 'package:pharmacist_mobile/data/datasources/cart_remote_data_source.dart';
 import 'package:pharmacist_mobile/data/datasources/orders_remote_data_source.dart';
 
-
 // Repositories
 import 'package:pharmacist_mobile/data/repositories/auth_repository_impl.dart';
 import 'package:pharmacist_mobile/data/repositories/employee_repository_impl.dart';
@@ -29,7 +28,7 @@ import 'package:pharmacist_mobile/domain/usecases/orders/get_orders.dart';
 import 'package:pharmacist_mobile/domain/usecases/orders/get_order_detail.dart';
 import 'package:pharmacist_mobile/domain/usecases/orders/request_order_otp.dart';
 import 'package:pharmacist_mobile/domain/usecases/orders/verify_order_otp.dart';
- 
+
 // Auth Usecases
 import 'package:pharmacist_mobile/domain/usecases/auth/sign_in.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/forgot_password.dart';
@@ -49,7 +48,9 @@ import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/employee/employee_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/cart/cart_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detail_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/orders_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/otp_verify/otp_verify_bloc.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -137,8 +138,12 @@ Future<void> setup() async {
       ));
   getIt.registerFactory(() => OrdersBloc(
         getOrders: getIt(),
-        getOrderDetail: getIt(),
-        requestOrderOtp: getIt(),
-        verifyOrderOtp: getIt(),
       ));
+  getIt.registerFactory(() => OrderDetailBloc(
+        getOrderDetail: getIt(),
+      ));
+  getIt.registerFactory(() => OtpVerifyBloc(
+    requestOrderOtp: getIt(),
+    verifyOrderOtp: getIt(),
+  ));
 }

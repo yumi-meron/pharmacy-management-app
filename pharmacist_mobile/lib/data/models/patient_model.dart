@@ -5,7 +5,7 @@ class PatientModel extends Patient {
     required String id,
     required String fullName,
     required String phoneNumber,
-    required String emergencyPhoneNumber,
+    String? emergencyPhoneNumber,
   }) : super(
           id: id,
           fullName: fullName,

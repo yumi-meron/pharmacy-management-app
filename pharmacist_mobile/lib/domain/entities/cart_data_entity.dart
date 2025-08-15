@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'cart_item.dart';
 
 class CartData {

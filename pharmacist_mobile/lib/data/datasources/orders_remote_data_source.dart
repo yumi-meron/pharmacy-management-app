@@ -7,8 +7,6 @@ import '../../core/constants/api_constants.dart';
 import '../../core/error/failure.dart';
 import '../models/order_model.dart';
 import '../models/order_detail_model.dart';
-import '../models/order_item_model.dart';
-import '../models/patient_model.dart';
 import '../../data/models/user_model.dart';
 
 abstract class OrdersRemoteDataSource {
@@ -82,8 +80,7 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
         Uri.parse('${ApiConstants.baseUrl}/api/orders/$id'),
         headers: headers,
       );
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+     
       if (response.statusCode == 200) {
         final decoded = json.decode(response.body) as Map<String, dynamic>;
         final model = OrderDetailModel.fromJson(decoded);

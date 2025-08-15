@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pharmacist_mobile/data/models/cart_item_model.dart';
 import 'package:pharmacist_mobile/domain/entities/medicine_variant.dart';
 import 'package:pharmacist_mobile/presentation/blocs/cart/cart_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';

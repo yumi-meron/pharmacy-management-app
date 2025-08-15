@@ -1,6 +1,5 @@
 import 'package:pharmacist_mobile/data/models/medicine_variant_model.dart';
 import 'package:pharmacist_mobile/domain/entities/medicine.dart';
-import 'package:pharmacist_mobile/domain/entities/medicine_variant.dart';
 
 class MedicineModel {
   final String id;
