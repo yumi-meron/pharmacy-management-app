@@ -5,6 +5,7 @@ import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_d
 import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detain_event.dart';
 import 'package:pinput/pinput.dart';
 
+
 class OrderDetailPage extends StatefulWidget {
   final String orderId;
   const OrderDetailPage({Key? key, required this.orderId}) : super(key: key);
