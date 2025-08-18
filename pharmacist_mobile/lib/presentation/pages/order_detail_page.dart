@@ -21,19 +21,30 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   Widget _buildPatientCard(order) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Patient Detail",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+            const Center(
+              child: Text(
+                "Patient Detail",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 12),
             Text("Name: ${order.patient.fullName}"),
+            const SizedBox(height: 8),
             Text("Phone: ${order.patient.phoneNumber}"),
+            const SizedBox(height: 8),
             Text("Emergency Phone: ${order.patient.emergencyPhoneNumber}"),
           ],
         ),
@@ -42,63 +53,55 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   Widget _buildMedicineTable(order) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("List of Medicines",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const Center(
+              child: Text("List of Medicines",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            ),
             const SizedBox(height: 12),
-            Table(
-              border: TableBorder.symmetric(
-                  inside: const BorderSide(color: Colors.grey)),
-              columnWidths: const {
-                0: FlexColumnWidth(2),
-                1: FlexColumnWidth(),
-                2: FlexColumnWidth(),
-                3: FlexColumnWidth(),
-              },
-              children: [
-                const TableRow(
-                  decoration: BoxDecoration(color: Color(0xFFEFEFEF)),
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.all(8), child: Text("Medicine")),
-                    Padding(padding: EdgeInsets.all(8), child: Text("Unit")),
-                    Padding(padding: EdgeInsets.all(8), child: Text("Qty")),
-                    Padding(padding: EdgeInsets.all(8), child: Text("Price")),
-                  ],
-                ),
-                ...order.items.map<TableRow>((item) {
-                  return TableRow(
+            Column(
+              children: order.items.map<Widget>((item) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(item.medicineName)),
-                      Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(item.unit)),
-                      Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Text("${item.quantity}")),
-                      Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Text("${item.pricePerUnit}")),
+                      Expanded(
+                          flex: 2,
+                          child: Text(item.medicineName,
+                              style: const TextStyle(fontSize: 12))),
+                      Expanded(
+                          child: Text(item.unit,
+                              style: const TextStyle(fontSize: 12))),
+                      Expanded(
+                          child: Text("${item.quantity}",
+                              style: const TextStyle(fontSize: 12))),
+                      Expanded(
+                          child: Text("${item.pricePerUnit}",
+                              style: const TextStyle(fontSize: 12))),
                     ],
-                  );
-                }).toList(),
-              ],
+                  ),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                "Total: ${order.totalPrice} ETB",
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                "Total:              ${order.totalPrice} ETB",
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -107,112 +110,208 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     );
   }
 
-  Widget _buildOtpSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("Send OTP Verification",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () {
-                  // send OTP to patient then open confirmation sheet
-                  showOtpConfirmationSheet(context);
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  side: const BorderSide(color: Colors.teal),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+  Widget _buildOtpSection(order) {
+    bool isPatientSelected = true; // Default selection
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(bottom: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Center(
+                child: Text(
+                  "Send OTP Verification",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                child: const Text("Patient Contact"),
               ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () {
-                  // send OTP to emergency contact then open confirmation sheet
-                  showOtpConfirmationSheet(context);
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  side: const BorderSide(color: Colors.teal),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text("Emergency Contact"),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isPatientSelected = true;
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              isPatientSelected ? Colors.green : Colors.white,
+                          border: Border.all(
+                            color: isPatientSelected
+                                ? Colors.green
+                                : Colors.grey.shade300,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        child: Column(
+                          children: [
+                            Text(
+                              "Patient Contact",
+                              style: TextStyle(
+                                color: isPatientSelected
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              order.patient.phoneNumber,
+                              style: TextStyle(
+                                color: isPatientSelected
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isPatientSelected = false;
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              !isPatientSelected ? Colors.green : Colors.white,
+                          border: Border.all(
+                            color: !isPatientSelected
+                                ? Colors.green
+                                : Colors.grey.shade300,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        child: Column(
+                          children: [
+                            Text(
+                              "Emergency Contact",
+                              style: TextStyle(
+                                color: !isPatientSelected
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              order.patient.emergencyPhoneNumber,
+                              style: TextStyle(
+                                color: !isPatientSelected
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        )
-      ],
+            ],
+          ),
+        );
+      },
     );
   }
 
   Widget _buildActionButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () {
-              // Cancel order
-            },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.red,
-              side: const BorderSide(color: Colors.red),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () {
+                // Cancel order
+              },
+              icon: const Icon(Icons.close, color: Colors.red),
+              label: const Text("Discard"),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                side: BorderSide.none, // Removed the border line
+              ),
             ),
-            child: const Text("Cancel"),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              // Confirm order
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () {
+                // Confirm order
+              },
+              icon: const Icon(Icons.check, color: Colors.white),
+              label: const Text("Confirm"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
             ),
-            child: const Text("Confirm"),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Order Detail')),
+      appBar: AppBar(
+        title: const Text(
+          'Order Detail',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: BlocBuilder<OrderDetailBloc, OrderDetailState>(
         builder: (context, state) {
           if (state is OrderDetailLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is OrderDetailLoaded) {
             final order = state.detail;
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildPatientCard(order),
-                  _buildMedicineTable(order),
-                  const SizedBox(height: 16),
-                  _buildOtpSection(),
-                  const SizedBox(height: 16),
-                  _buildActionButtons(),
-                ],
-              ),
+            return Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildPatientCard(order),
+                        _buildMedicineTable(order),
+                        const SizedBox(height: 16),
+                        _buildOtpSection(order),
+                      ],
+                    ),
+                  ),
+                ),
+                _buildActionButtons(), // Buttons at the bottom
+              ],
             );
           } else if (state is OrderDetailError) {
             return Center(child: Text("Error: ${state.message}"));
@@ -277,7 +376,8 @@ void showOtpConfirmationSheet(BuildContext context) {
                   },
                   child: const Text(
                     "Send OTP Again",
-                    style: TextStyle(color: Colors.teal, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                        color: Colors.teal, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
@@ -306,7 +406,8 @@ void showOtpConfirmationSheet(BuildContext context) {
                     },
                     icon: const Icon(Icons.check),
                     label: const Text("Confirm"),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.teal),
                   ),
                 ),
               ],
