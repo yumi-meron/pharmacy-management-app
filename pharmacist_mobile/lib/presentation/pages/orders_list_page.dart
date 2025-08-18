@@ -41,7 +41,9 @@ class _OrdersListPageState extends State<OrdersListPage> {
               itemBuilder: (context, index) {
                 final order = orders[index];
                 return ListTile(
-                  title: Text('Order #${order.id}'),
+                  // title: Text('Order #${order.id}'),
+                  title: Text('Order for ${order.patientName}'),
+
                   subtitle: Text(
                     'Date: ${order.orderDate} ',
                   ),
