@@ -42,6 +42,7 @@ class _OrdersListPageState extends State<OrdersListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       body: Column(
         children: [
           Padding(
@@ -73,6 +74,7 @@ class _OrdersListPageState extends State<OrdersListPage> {
                   borderSide: BorderSide(
                     color: Colors.grey
                         .shade300, // Light grey border color for enabled state
+
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
