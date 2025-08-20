@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pharmacist_mobile/core/di/injection.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_event.dart';
@@ -23,7 +25,16 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _usageController = TextEditingController();
 
+  File? _pickedImage;
 
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _pickedImage = File(pickedFile.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +46,16 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
             icon: const Icon(Icons.save),
             onPressed: () {
               if (_formKey.currentState!.validate()) {
-                // TODO: Dispatch update medicine event with new values
-                // Example: context.read<MedicineBloc>().add(UpdateMedicineEvent(...));
+                // Example of dispatch (extend to include _pickedImage path/upload later)
+                // context.read<MedicineBloc>().add(UpdateMedicineEvent(
+                //   id: widget.medicineId,
+                //   stock: int.parse(_stockController.text),
+                //   price: double.parse(_priceController.text),
+                //   expiryDate: _expireDateController.text,
+                //   description: _descriptionController.text,
+                //   usage: _usageController.text,
+                //   pictureFile: _pickedImage, // handle uploading in bloc
+                // ));
                 Navigator.pop(context);
               }
             },
@@ -54,9 +73,9 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
               orElse: () => medicine.variants.first,
             );
 
-            // Prefill controllers (only if empty, so they don’t keep resetting on rebuilds)
+            // Prefill controllers only once
             if (_stockController.text.isEmpty) {
-              _stockController.text = selectedVariant.quantityAvailable.toString() ;
+              _stockController.text = selectedVariant.quantityAvailable.toString();
             }
             if (_priceController.text.isEmpty) {
               _priceController.text = selectedVariant.pricePerUnit.toString();
@@ -77,21 +96,51 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Medicine Picture
-                    Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          // TODO: implement image picker
-                        },
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: medicine.picture != null
-                              ? NetworkImage(medicine.picture!)
-                              : null,
-                          child: medicine.picture == null
-                              ? const Icon(Icons.add_a_photo, size: 40)
-                              : null,
-                        ),
+                    // Editable Medicine Picture (rectangular with overlay icon)
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: 250,
+                            color: Colors.blue[50],
+                            child: _pickedImage != null
+                                ? Image.file(
+                                    _pickedImage!,
+                                    width: double.infinity,
+                                    height: 250,
+                                    fit: BoxFit.cover,
+                                  )
+                                : (medicine.picture != null && medicine.picture!.isNotEmpty)
+                                    ? Image.network(
+                                        medicine.picture!,
+                                        width: double.infinity,
+                                        height: 250,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : const Placeholder(
+                                        fallbackHeight: 250,
+                                        fallbackWidth: double.infinity,
+                                      ),
+                          ),
+                          Positioned(
+                            bottom: 10,
+                            right: 10,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: const Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -117,8 +166,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
-                      validator: (value) =>
-                          value!.isEmpty ? "Enter price" : null,
+                      validator: (value) => value!.isEmpty ? "Enter price" : null,
                     ),
                     const SizedBox(height: 12),
 
