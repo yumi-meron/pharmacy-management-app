@@ -65,7 +65,7 @@ class SettingsPage extends StatelessWidget {
                   },
                 );
 
-                // Refresh the employee list
+                // Refresh employee list
                 context.read<EmployeeBloc>().add(FetchEmployees());
               }
 
@@ -138,7 +138,7 @@ class SettingsPage extends StatelessWidget {
                 if (user.role == 'owner' || user.role == 'admin') {
                   return _buildAdminSettings(context, user);
                 } else if (user.role == 'pharmacist') {
-                  return _buildPharmacistSettings(user);
+                  return _buildPharmacistSettings(context, user);
                 } else {
                   return const Center(child: Text('Unknown role'));
                 }
@@ -152,91 +152,99 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
+  Widget _buildUserCard(BuildContext context, User user, {VoidCallback? onEdit}) {
+    return Stack(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(top: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  user.picture,
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 70,
+                      height: 70,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.person, size: 40, color: Colors.white),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      user.phoneNumber,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black45,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      user.role,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black45,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (onEdit != null)
+          Positioned(
+            top: 20,
+            right: 5,
+            child: IconButton(
+              onPressed: onEdit,
+              icon: const Icon(Icons.edit, color: Colors.grey),
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _buildAdminSettings(BuildContext context, User user) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Stack(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(top: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      user.picture ,
-                      width: 70,
-                      height: 70,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: 70,
-                          height: 70,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.person, size: 40, color: Colors.white),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user.name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          user.phoneNumber,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black45,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          user.role,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black45,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 20,
-              right: 5,
-              child: IconButton(
-                onPressed: () {
-                  // Handle edit
-                },
-                icon: const Icon(Icons.edit, color: Colors.grey),
-              ),
-            ),
-          ],
+        _buildUserCard(
+          context,
+          user,
+          onEdit: () => _showEditProfileSheet(context, user)
+          
         ),
         const SizedBox(height: 30),
         SizedBox(
@@ -265,9 +273,7 @@ class SettingsPage extends StatelessWidget {
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           ElevatedButton(
-                            onPressed: () {
-                              _showAddEmployeeSheet(context);
-                            },
+                            onPressed: () => _showAddEmployeeSheet(context),
                             style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                             child: const Text("+ New Employee", style: TextStyle(color: Colors.teal)),
                           ),
@@ -284,7 +290,7 @@ class SettingsPage extends StatelessWidget {
                           ),
                         ),
                         onChanged: (value) {
-                          // Handle search
+                          // TODO: handle search
                         },
                       ),
                       const SizedBox(height: 10),
@@ -292,7 +298,7 @@ class SettingsPage extends StatelessWidget {
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(16),
                               child: Image.network(
-                                employee.picture ,
+                                employee.picture,
                                 width: 40,
                                 height: 40,
                                 fit: BoxFit.cover,
@@ -321,91 +327,14 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPharmacistSettings(User user) {
+  Widget _buildPharmacistSettings(BuildContext context, User user) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Stack(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(top: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      user.picture,
-                      width: 70,
-                      height: 70,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: 70,
-                          height: 70,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.person, size: 40, color: Colors.white),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user.name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          user.phoneNumber ,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black45,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          user.role,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black45,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 20,
-              right: 5,
-              child: IconButton(
-                onPressed: () {
-                  // Handle edit
-                },
-                icon: const Icon(Icons.edit, color: Colors.grey),
-              ),
-            ),
-          ],
+        _buildUserCard(
+          context,
+          user,
+          onEdit: () => _showEditProfileSheet(context, user),
         ),
         const SizedBox(height: 30),
       ],
@@ -413,6 +342,126 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
+// --- Edit Profile Sheet ---
+void _showEditProfileSheet(BuildContext rootContext, User user) {
+  final nameController = TextEditingController(text: user.name);
+  final phoneController = TextEditingController(text: user.phoneNumber);
+  final pictureController = TextEditingController(text: user.picture);
+
+  showModalBottomSheet(
+    context: rootContext,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (context) {
+      final screenHeight = MediaQuery.of(context).size.height;
+      final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+
+      return StatefulBuilder(builder: (context, setState) {
+        return Container(
+          height: screenHeight * 0.65,
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: bottomPadding + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Center(
+                  child: Text(
+                    "Edit Profile",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: "Full Name",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    labelText: "Phone Number",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: pictureController,
+                  decoration: const InputDecoration(
+                    labelText: "Profile Picture URL",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 100),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                        ),
+                        child: const Text("Cancel"),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final updatedUser = user.copyWith(
+                            name: nameController.text.trim(),
+                            phoneNumber: phoneController.text.trim(),
+                            picture: pictureController.text.trim(),
+                          );
+
+                          // Dispatch event to update user
+                          // rootContext.read<AuthBloc>().add(UpdateProfile(user: updatedUser));
+
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                        ),
+                        child: const Text(
+                          "Save",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      });
+    },
+  );
+}
+
+// --- Add Employee Sheet ---
 void _showAddEmployeeSheet(BuildContext rootContext) {
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
@@ -455,7 +504,7 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
                   controller: nameController,
                   decoration: const InputDecoration(
                     labelText: "Full Name",
-                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16)),),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -470,12 +519,14 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
                   ),
                 ),
                 const SizedBox(height: 20),
-                TextField(
+                                TextField(
                   controller: passwordController,
                   obscureText: obscurePassword,
                   decoration: InputDecoration(
                     labelText: "Password",
-                    border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16)),),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -491,15 +542,21 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
                 const SizedBox(height: 20),
                 DropdownButtonFormField<String>(
                   value: selectedRole,
-                  items: const [
-                    DropdownMenuItem(value: 'pharmacist', child: Text("Pharmacist")),
-                    // DropdownMenuItem(value: 'Manager', child: Text("Manager")),
-                  ],
-                  onChanged: (value) => selectedRole = value,
                   decoration: const InputDecoration(
                     labelText: "Role",
-                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16)),),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
                   ),
+                  items: const [
+                    DropdownMenuItem(value: 'pharmacist', child: Text("Pharmacist")),
+                    DropdownMenuItem(value: 'admin', child: Text("Admin")),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedRole = value;
+                    });
+                  },
                 ),
                 const SizedBox(height: 100),
                 Row(
@@ -519,24 +576,27 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          final name = nameController.text.trim();
-                          final phone = phoneController.text.trim();
-                          final role = selectedRole;
-                          final password = passwordController.text.trim();
-
-                          if (name.isEmpty || phone.isEmpty || role == null || password.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("All fields are required.")),
+                          if (selectedRole == null ||
+                              nameController.text.trim().isEmpty ||
+                              phoneController.text.trim().isEmpty ||
+                              passwordController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(rootContext).showSnackBar(
+                              const SnackBar(
+                                content: Text("Please fill all fields"),
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.red,
+                              ),
                             );
                             return;
                           }
 
+                          // Dispatch add employee event
                           rootContext.read<EmployeeBloc>().add(
                                 AddEmployee(
-                                  name: name,
-                                  phoneNumber: phone,
-                                  role: role,
-                                  password: password,
+                                  name: nameController.text.trim(),
+                                  phoneNumber: phoneController.text.trim(),
+                                  password: passwordController.text.trim(),
+                                  role: selectedRole!,
                                 ),
                               );
 
@@ -549,7 +609,7 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
                           ),
                         ),
                         child: const Text(
-                          "Confirm",
+                          "Save",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -564,3 +624,5 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
     },
   );
 }
+
+                   
