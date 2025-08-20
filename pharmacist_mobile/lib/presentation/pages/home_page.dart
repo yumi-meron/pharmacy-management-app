@@ -26,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: _selectedIndex == 0
           ? AppBar(
               title: BlocBuilder<AuthBloc, AuthState>(

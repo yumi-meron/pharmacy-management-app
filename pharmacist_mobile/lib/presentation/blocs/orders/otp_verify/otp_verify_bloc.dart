@@ -21,6 +21,9 @@ class OtpVerifyBloc extends Bloc<OtpVerifyEvent, OtpVerifyState> {
         (_) => emit(OtpRequestSuccess()),
       );
     });
+    on<OtpVerifyInitialEvent>((event, emit) {
+      emit(OtpVerifyInitial());
+    });
 
     on<VerifyOrderOtpEvent>((event, emit) async {
       emit(OtpVerifyLoading());
