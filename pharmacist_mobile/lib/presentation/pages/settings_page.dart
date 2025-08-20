@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pharmacist_mobile/core/di/injection.dart';
@@ -9,6 +11,7 @@ import 'package:pharmacist_mobile/presentation/blocs/employee/employee_event.dar
 import 'package:pharmacist_mobile/presentation/blocs/employee/employee_state.dart';
 import 'package:pharmacist_mobile/presentation/pages/sign_in_page.dart';
 import 'package:pharmacist_mobile/presentation/blocs/employee/employee_bloc.dart';
+
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -46,9 +49,9 @@ class SettingsPage extends StatelessWidget {
                       height: height * 0.3,
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
-                      child: Column(
+                      child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(Icons.verified, color: Colors.teal, size: 70),
                           SizedBox(height: 24),
                           Text(
@@ -343,10 +346,13 @@ class SettingsPage extends StatelessWidget {
 }
 
 // --- Edit Profile Sheet ---
+
 void _showEditProfileSheet(BuildContext rootContext, User user) {
   final nameController = TextEditingController(text: user.name);
   final phoneController = TextEditingController(text: user.phoneNumber);
-  final pictureController = TextEditingController(text: user.picture);
+
+  File? pictureFile; // local file if user picks new image
+  final picker = ImagePicker();
 
   showModalBottomSheet(
     context: rootContext,
@@ -360,8 +366,17 @@ void _showEditProfileSheet(BuildContext rootContext, User user) {
       final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
       return StatefulBuilder(builder: (context, setState) {
+        Future<void> _pickImage() async {
+          final picked = await picker.pickImage(source: ImageSource.gallery);
+          if (picked != null) {
+            setState(() {
+              pictureFile = File(picked.path);
+            });
+          }
+        }
+
         return Container(
-          height: screenHeight * 0.65,
+          height: screenHeight * 0.75,
           padding: EdgeInsets.only(
             left: 24,
             right: 24,
@@ -378,7 +393,55 @@ void _showEditProfileSheet(BuildContext rootContext, User user) {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
+
+                // Profile picture
+                Center(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 55,
+                        backgroundImage: pictureFile != null
+                            ? FileImage(pictureFile!)
+                            : (user.picture != null && user.picture!.isNotEmpty)
+                                ? NetworkImage(user.picture!)
+                                : null,
+                        child: (user.picture == null ||
+                                user.picture!.isEmpty && pictureFile == null)
+                            ? Text(
+                                user.name.isNotEmpty
+                                    ? user.name[0].toUpperCase()
+                                    : "?",
+                                style: const TextStyle(
+                                    fontSize: 32, color: Colors.white),
+                              )
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: InkWell(
+                          onTap: _pickImage,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.teal,
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                // Name field
                 TextField(
                   controller: nameController,
                   decoration: const InputDecoration(
@@ -389,6 +452,8 @@ void _showEditProfileSheet(BuildContext rootContext, User user) {
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Phone field
                 TextField(
                   controller: phoneController,
                   keyboardType: TextInputType.phone,
@@ -399,17 +464,9 @@ void _showEditProfileSheet(BuildContext rootContext, User user) {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: pictureController,
-                  decoration: const InputDecoration(
-                    labelText: "Profile Picture URL",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 100),
+                const SizedBox(height: 80),
+
+                // Action buttons
                 Row(
                   children: [
                     Expanded(
@@ -430,11 +487,14 @@ void _showEditProfileSheet(BuildContext rootContext, User user) {
                           final updatedUser = user.copyWith(
                             name: nameController.text.trim(),
                             phoneNumber: phoneController.text.trim(),
-                            picture: pictureController.text.trim(),
+                            // If user picked new image, save file path (or upload later)
+                            picture: pictureFile?.path ?? user.picture,
                           );
 
                           // Dispatch event to update user
-                          // rootContext.read<AuthBloc>().add(UpdateProfile(user: updatedUser));
+                          // rootContext
+                          //     .read<AuthBloc>()
+                          //     .add(UpdateProfile(user: updatedUser));
 
                           Navigator.pop(context);
                         },

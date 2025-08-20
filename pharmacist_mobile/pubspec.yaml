@@ -9,7 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+    
+  image_picker: ^1.0.7
   flutter_bloc: ^9.1.1
   dio: ^5.3.3
   equatable: ^2.0.5
@@ -26,7 +27,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^6.0.0
+  flutter_lints: ^3.0.0
   mockito: ^5.4.4
   build_runner: ^2.4.9
 
