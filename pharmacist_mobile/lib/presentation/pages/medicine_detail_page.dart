@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pharmacist_mobile/domain/entities/medicine_variant.dart';
+import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/auth/auth_state.dart';
 import 'package:pharmacist_mobile/presentation/blocs/cart/cart_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_event.dart';
@@ -8,6 +10,7 @@ import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_state.dar
 import 'package:pharmacist_mobile/core/di/injection.dart';
 import 'package:intl/intl.dart';
 import 'package:pharmacist_mobile/presentation/blocs/cart/cart_event.dart';
+import 'package:pharmacist_mobile/presentation/pages/edit_medicine_page.dart';
 
 class MedicineDetailPage extends StatefulWidget {
   final String medicineId;
@@ -37,7 +40,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
         ),
       ],
       child: Scaffold(
-        backgroundColor: Colors.white,
+        
         body: BlocBuilder<MedicineBloc, MedicineState>(
           builder: (context, state) {
             if (state is MedicineLoading) {
@@ -266,6 +269,53 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                           size: 14,
                         ),
                       ),
+                    ),
+                  ),
+                  // 🔹 Three-dot menu overlay (right)
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: BlocBuilder<AuthBloc, AuthState>(
+                      builder: (context, state) {
+                        if (state is AuthAuthenticated) {
+                          final user = state.user;
+
+                          if (user.role == 'owner' || user.role == 'admin') {
+                            return PopupMenuButton<String>(
+                              color: Colors.white,
+                              icon: const Icon(Icons.more_vert, color: Colors.white),
+                              onSelected: (value) {
+                                if (value == "edit") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BlocProvider(
+                                        create: (_) => getIt<MedicineBloc>()
+                                          ..add(GetMedicineDetailsEvent(widget.medicineId)),
+                                        child: EditMedicinePage(medicineId: widget.medicineId),
+                                      ),
+                                    ),
+                                  );
+                                } else if (value == "delete") {
+                                  // handle delete
+                                  Navigator.pop(context);
+                                }
+                              },
+                              itemBuilder: (context) => const [
+                                PopupMenuItem(
+                                  value: "edit",
+                                  child: Text("Edit"),
+                                ),
+                                PopupMenuItem(
+                                  value: "delete",
+                                  child: Text("Delete"),
+                                ),
+                              ],
+                            );
+                          }
+                        }
+                        return const SizedBox.shrink(); // no menu for other roles
+                      },
                     ),
                   ),
                 ],
