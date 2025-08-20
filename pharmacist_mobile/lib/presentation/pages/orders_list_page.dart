@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pharmacist_mobile/core/di/injection.dart';
 import 'package:pharmacist_mobile/domain/entities/order.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detail_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/orders_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/orders_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/orders_state.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/otp_verify/otp_verify_bloc.dart';
 import 'package:pharmacist_mobile/presentation/pages/order_detail_page.dart';
 import 'package:intl/intl.dart';
 
@@ -176,11 +179,25 @@ class _OrdersListPageState extends State<OrdersListPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    OrderDetailPage(orderId: order.id),
+                                builder: (_) => MultiBlocProvider(
+                                  providers: [
+                                    BlocProvider<OtpVerifyBloc>(
+                                      create: (_) => OtpVerifyBloc(
+                                        requestOrderOtp: getIt(),
+                                        verifyOrderOtp: getIt(),
+                                      ),
+                                    ),
+                                    BlocProvider.value(
+                                      value: context.read<OrderDetailBloc>(),
+                                    ),
+                                  ],
+                                  child: OrderDetailPage(orderId: order.id),
+                                ),
                               ),
                             );
                           },
+
+
                         ),
                       );
                     },

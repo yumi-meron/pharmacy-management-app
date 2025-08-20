@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pharmacist_mobile/domain/entities/order_detail.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detail_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detail_state.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detain_event.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/otp_verify/otp_verify_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/otp_verify/otp_verify_event.dart';
+import 'package:pharmacist_mobile/presentation/blocs/orders/otp_verify/otp_verify_state.dart';
 import 'package:pinput/pinput.dart';
 
 
 class OrderDetailPage extends StatefulWidget {
   final String orderId;
   const OrderDetailPage({Key? key, required this.orderId}) : super(key: key);
+  
 
   @override
   State<OrderDetailPage> createState() => _OrderDetailPageState();
 }
 
 class _OrderDetailPageState extends State<OrderDetailPage> {
+  bool _isPatientSelected = true;
   @override
   void initState() {
     super.initState();
     context.read<OrderDetailBloc>().add(LoadOrderDetailEvent(widget.orderId));
+    // context.read<OtpVerifyBloc>().add(OtpVerifyInitialEvent());
   }
 
   Widget _buildPatientCard(order) {
@@ -112,7 +119,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   Widget _buildOtpSection(order) {
-    bool isPatientSelected = true; // Default selection
+    // bool isPatientSelected = true; // Default selection
 
     return StatefulBuilder(
       builder: (context, setState) {
@@ -140,15 +147,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
-                          isPatientSelected = true;
+                          _isPatientSelected = true;
                         });
                       },
                       child: Container(
                         decoration: BoxDecoration(
                           color:
-                              isPatientSelected ? Colors.green : Colors.white,
+                              _isPatientSelected ? Colors.green : Colors.white,
                           border: Border.all(
-                            color: isPatientSelected
+                            color: _isPatientSelected
                                 ? Colors.green
                                 : Colors.grey.shade300,
                           ),
@@ -160,7 +167,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             Text(
                               "Patient Contact",
                               style: TextStyle(
-                                color: isPatientSelected
+                                color: _isPatientSelected
                                     ? Colors.white
                                     : Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -170,7 +177,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             Text(
                               order.patient.phoneNumber,
                               style: TextStyle(
-                                color: isPatientSelected
+                                color: _isPatientSelected
                                     ? Colors.white
                                     : Colors.black,
                               ),
@@ -185,15 +192,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
-                          isPatientSelected = false;
+                          _isPatientSelected = false;
                         });
                       },
                       child: Container(
                         decoration: BoxDecoration(
                           color:
-                              !isPatientSelected ? Colors.green : Colors.white,
+                              !_isPatientSelected ? Colors.green : Colors.white,
                           border: Border.all(
-                            color: !isPatientSelected
+                            color: !_isPatientSelected
                                 ? Colors.green
                                 : Colors.grey.shade300,
                           ),
@@ -205,7 +212,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             Text(
                               "Emergency Contact",
                               style: TextStyle(
-                                color: !isPatientSelected
+                                color: !_isPatientSelected
                                     ? Colors.white
                                     : Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -215,7 +222,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             Text(
                               order.patient.emergencyPhoneNumber,
                               style: TextStyle(
-                                color: !isPatientSelected
+                                color: !_isPatientSelected
                                     ? Colors.white
                                     : Colors.black,
                               ),
@@ -234,7 +241,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(order) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -259,7 +266,20 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           Expanded(
             child: ElevatedButton.icon(
               onPressed: () {
+                final phoneNumber = _isPatientSelected
+                  ? order.patient.phoneNumber
+                  : order.patient.emergencyPhoneNumber;
+                // Request OTP for order confirmation
+                context.read<OtpVerifyBloc>().add(
+                  RequestOrderOtpEvent(
+                    id: order.id,
+                    phoneNumber: phoneNumber,
+                  ),
+                );
+
                 // Confirm order
+                showOtpConfirmationSheet(context, order);
+                
               },
               icon: const Icon(Icons.check, color: Colors.white),
               label: const Text("Confirm"),
@@ -311,7 +331,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     ),
                   ),
                 ),
-                _buildActionButtons(), // Buttons at the bottom
+                _buildActionButtons(order), // Buttons at the bottom
               ],
             );
           } else if (state is OrderDetailError) {
@@ -324,7 +344,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 }
 
-void showOtpConfirmationSheet(BuildContext context) {
+void showOtpConfirmationSheet(BuildContext context, OrderDetail order) {
   final otpController = TextEditingController();
 
   showModalBottomSheet(
@@ -337,84 +357,98 @@ void showOtpConfirmationSheet(BuildContext context) {
     builder: (context) {
       final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
-      return Padding(
-        padding: EdgeInsets.only(
-          left: 24,
-          right: 24,
-          top: 24,
-          bottom: bottomPadding + 24,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              "OTP Confirmation",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      return BlocBuilder<OtpVerifyBloc, OtpVerifyState>(
+        builder: (context, state) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 24,
+              bottom: bottomPadding + 24,
             ),
-            const SizedBox(height: 24),
-            // OTP Input (using pinput or manual)
-            Pinput(
-              length: 6,
-              controller: otpController,
-              defaultPinTheme: PinTheme(
-                width: 50,
-                height: 50,
-                textStyle: const TextStyle(fontSize: 20),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text("Didn't receive it yet? "),
-                GestureDetector(
-                  onTap: () {
-                    // resend OTP
-                  },
-                  child: const Text(
-                    "Send OTP Again",
-                    style: TextStyle(
-                        color: Colors.teal, fontWeight: FontWeight.w500),
+                const Text(
+                  "OTP Confirmation",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 24),
+                Pinput(
+                  length: 6,
+                  controller: otpController,
+                  defaultPinTheme: PinTheme(
+                    width: 50,
+                    height: 50,
+                    textStyle: const TextStyle(fontSize: 20),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Didn't receive it yet? "),
+                    GestureDetector(
+                      onTap: () {
+                        // resend OTP
+                      },
+                      child: const Text(
+                        "Send OTP Again",
+                        style: TextStyle(
+                            color: Colors.teal, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancel"),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: state is OtpVerifyLoading
+                            ? null
+                            : () {
+                                final otp = otpController.text.trim();
+                                if (otp.length == 6) {
+                                  context.read<OtpVerifyBloc>().add(
+                                        VerifyOrderOtpEvent(
+                                          id: order.id,
+                                          otp: otp,
+                                        ),
+                                      );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.teal),
+                        child: state is OtpVerifyLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text("Confirm"),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Cancel"),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      final otp = otpController.text.trim();
-                      if (otp.length == 6) {
-                        // TODO: verify OTP via bloc
-                        // context.read<OrderDetailBloc>().add(VerifyOtpEvent(otp));
-                        // Close the sheet after verification
-
-                        Navigator.pop(context);
-                      }
-                    },
-                    icon: const Icon(Icons.check),
-                    label: const Text("Confirm"),
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          );
+        },
       );
     },
   );

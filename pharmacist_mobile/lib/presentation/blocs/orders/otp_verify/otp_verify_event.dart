@@ -4,6 +4,12 @@ abstract class OtpVerifyEvent {
   @override
   List<Object?> get props => [];
 }
+class OtpVerifyInitialEvent extends OtpVerifyEvent {
+  const OtpVerifyInitialEvent();
+
+  @override
+  List<Object?> get props => [];
+}
 class RequestOrderOtpEvent extends OtpVerifyEvent {
   final String id;
   final String phoneNumber;

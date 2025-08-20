@@ -240,64 +240,67 @@ class SettingsPage extends StatelessWidget {
   }
 
   Widget _buildAdminSettings(BuildContext context, User user) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildUserCard(
-          context,
-          user,
-          onEdit: () => _showEditProfileSheet(context, user)
-          
-        ),
-        const SizedBox(height: 30),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.7,
-          child: RefreshIndicator(
-            onRefresh: () async {
-              context.read<EmployeeBloc>().add(FetchEmployees());
-            },
-            child: BlocBuilder<EmployeeBloc, EmployeeState>(
-              builder: (context, state) {
-                if (state is EmployeeLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is EmployeeError) {
-                  return Center(child: Text(state.message));
-                } else if (state is EmployeeLoaded) {
-                  final employees = state.employees;
-                  return ListView(
-                    padding: const EdgeInsets.all(0),
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "List of Employees",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => _showAddEmployeeSheet(context),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                            child: const Text("+ New Employee", style: TextStyle(color: Colors.teal)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: "Search...",
-                          prefixIcon: const Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Color.fromARGB(255, 208, 208, 208)),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 70), // ~ height of navigation bar
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _buildUserCard(
+            context,
+            user,
+            onEdit: () => _showEditProfileSheet(context, user)
+            
+          ),
+          const SizedBox(height: 30),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: RefreshIndicator(
+              onRefresh: () async {
+                context.read<EmployeeBloc>().add(FetchEmployees());
+              },
+              child: BlocBuilder<EmployeeBloc, EmployeeState>(
+                builder: (context, state) {
+                  if (state is EmployeeLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is EmployeeError) {
+                    return Center(child: Text(state.message));
+                  } else if (state is EmployeeLoaded) {
+                    final employees = state.employees;
+                    return ListView(
+                      padding: const EdgeInsets.all(0),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "List of Employees",
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => _showAddEmployeeSheet(context),
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                              child: const Text("+ New Employee", style: TextStyle(color: Colors.teal)),
+                            ),
+                          ],
                         ),
-                        onChanged: (value) {
-                          // TODO: handle search
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      ...employees.map((employee) => ListTile(
+                        const SizedBox(height: 10),
+                        TextField(
+                          decoration: InputDecoration(
+                            hintText: "Search...",
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Color.fromARGB(255, 208, 208, 208)),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          onChanged: (value) {
+                            // TODO: handle search
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        ...employees.map(
+                          (employee) => ListTile(
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(16),
                               child: Image.network(
@@ -317,16 +320,76 @@ class SettingsPage extends StatelessWidget {
                             ),
                             title: Text(employee.name),
                             subtitle: Text(employee.role),
-                          )),
-                    ],
-                  );
-                }
-                return const Center(child: Text('No employees data'));
-              },
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Dialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(24),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 35,
+                                            backgroundImage: NetworkImage(employee.picture),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Text(
+                                            employee.name,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            employee.phoneNumber,
+                                            style: const TextStyle(fontSize: 14, color: Colors.black45),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            employee.role,
+                                            style: const TextStyle(fontSize: 14, color: Colors.black45),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          ElevatedButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.teal,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(16),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              "Close",
+                                              style: TextStyle(color: Colors.white),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+      
+                          ),
+                        )
+      
+                      ],
+                    );
+                  }
+                  return const Center(child: Text('No employees data'));
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
