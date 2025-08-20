@@ -297,27 +297,87 @@ class SettingsPage extends StatelessWidget {
                         },
                       ),
                       const SizedBox(height: 10),
-                      ...employees.map((employee) => ListTile(
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: Image.network(
-                                employee.picture,
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: 40,
-                                    height: 40,
-                                    color: Colors.grey[300],
-                                    child: const Icon(Icons.person, size: 24, color: Colors.white),
-                                  );
-                                },
-                              ),
+                      ...employees.map(
+                        (employee) => ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.network(
+                              employee.picture,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: 40,
+                                  height: 40,
+                                  color: Colors.grey[300],
+                                  child: const Icon(Icons.person, size: 24, color: Colors.white),
+                                );
+                              },
                             ),
-                            title: Text(employee.name),
-                            subtitle: Text(employee.role),
-                          )),
+                          ),
+                          title: Text(employee.name),
+                          subtitle: Text(employee.role),
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(24),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 35,
+                                          backgroundImage: NetworkImage(employee.picture),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          employee.name,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          employee.phoneNumber,
+                                          style: const TextStyle(fontSize: 14, color: Colors.black45),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          employee.role,
+                                          style: const TextStyle(fontSize: 14, color: Colors.black45),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        ElevatedButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.teal,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(16),
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            "Close",
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }
+
+                        ),
+                      )
+
                     ],
                   );
                 }
