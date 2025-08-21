@@ -2,9 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:pharmacist_mobile/core/di/injection.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
-import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_state.dart';
 
 class EditMedicinePage extends StatefulWidget {

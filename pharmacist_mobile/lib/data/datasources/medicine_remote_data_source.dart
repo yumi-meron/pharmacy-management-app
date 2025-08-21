@@ -3,34 +3,47 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
-import 'package:pharmacist_mobile/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http_parser/http_parser.dart';
 
 import 'package:pharmacist_mobile/core/constants/api_constants.dart';
 import 'package:pharmacist_mobile/core/error/failure.dart';
+import 'package:pharmacist_mobile/data/models/user_model.dart';
 import 'package:pharmacist_mobile/data/models/medicine_model.dart';
+import 'package:pharmacist_mobile/data/models/update_medicine_model.dart';
 import 'package:pharmacist_mobile/domain/entities/medicine.dart';
 
-class MedicineRemoteDataSource {
+/// 🔹 Abstract definition
+abstract class MedicineRemoteDataSource {
+  Future<Either<Failure, List<Medicine>>> getAllMedicines();
+  Future<Either<Failure, List<Medicine>>> searchMedicines(String query);
+  Future<Either<Failure, Medicine>> getMedicineDetails(String id);
+  Future<UpdateMedicineModel> updateMedicine(UpdateMedicineModel medicine);
+}
+
+/// 🔹 Implementation
+class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
   late final http.Client _httpClient;
   final SharedPreferences _prefs;
 
-  MedicineRemoteDataSource({
+  MedicineRemoteDataSourceImpl({
     http.Client? client,
     required SharedPreferences prefs,
   }) : _prefs = prefs {
     _httpClient = client ?? http.Client();
   }
 
+  /// 🔹 Private helper for headers
   Future<Map<String, String>> _getHeaders() async {
     final token = _prefs.getString('token');
     final userJson = _prefs.getString('user');
 
     if (token == null) throw Exception('No token found');
-
     if (userJson == null) throw Exception('No user data found');
+
     final userMap = jsonDecode(userJson);
     final user = UserModel.fromJson(userMap);
+
     return {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
@@ -39,6 +52,8 @@ class MedicineRemoteDataSource {
     };
   }
 
+  /// 🔹 Get all medicines
+  @override
   Future<Either<Failure, List<Medicine>>> getAllMedicines() async {
     try {
       final headers = await _getHeaders();
@@ -63,6 +78,56 @@ class MedicineRemoteDataSource {
     }
   }
 
+  /// 🔹 Update medicine
+  @override
+  Future<UpdateMedicineModel> updateMedicine(UpdateMedicineModel medicine) async {
+    final headers = await _getHeaders();
+    final uri = Uri.parse(
+    '${ApiConstants.baseUrl}/api/medicines/${medicine.id}/variants/${medicine.variantid}',
+  );
+
+  // Use MultipartRequest for file + fields
+  final request = http.MultipartRequest("PUT", uri);
+
+  // Add headers (excluding Content-Type, since Multipart will set it automatically)
+  request.headers.addAll(headers..remove('Content-Type'));
+
+  // Add text fields
+  request.fields['name'] = medicine.name;
+  request.fields['description'] = medicine.description;
+  request.fields['barcode'] = medicine.barcode;
+  request.fields['unit'] = medicine.unit;
+  request.fields['brand'] = medicine.brand;
+  request.fields['price'] = medicine.price.toString();
+  request.fields['quantityAvailable'] = medicine.quantityAvailable.toString();
+  request.fields['expiryDate'] = medicine.expiryDate;
+
+  // Handle image upload if provided
+  if (medicine.imageUrl.isNotEmpty && File(medicine.imageUrl).existsSync()) {
+    final file = File(medicine.imageUrl);
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'image', // 🔹 field name expected by API
+        file.path,
+        contentType: MediaType('image', 'jpeg'), // or png if needed
+      ),
+    );
+  }
+
+  // Send request
+  final streamedResponse = await _httpClient.send(request);
+  final response = await http.Response.fromStream(streamedResponse);
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    return UpdateMedicineModel.fromJson(data);
+  } else {
+    throw Exception("Failed to update medicine: ${response.body}");
+  }
+}
+
+  /// 🔹 Search medicines
+  @override
   Future<Either<Failure, List<Medicine>>> searchMedicines(String query) async {
     try {
       final headers = await _getHeaders();
@@ -70,6 +135,7 @@ class MedicineRemoteDataSource {
         Uri.parse('${ApiConstants.baseUrl}/api/medicines/search?query=$query'),
         headers: headers,
       );
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         final result = data
@@ -86,6 +152,8 @@ class MedicineRemoteDataSource {
     }
   }
 
+  /// 🔹 Get medicine details
+  @override
   Future<Either<Failure, Medicine>> getMedicineDetails(String id) async {
     try {
       final headers = await _getHeaders();
@@ -93,6 +161,7 @@ class MedicineRemoteDataSource {
         Uri.parse('${ApiConstants.baseUrl}/api/medicines/$id'),
         headers: headers,
       );
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final result = MedicineModel.fromJson(data).toEntity();

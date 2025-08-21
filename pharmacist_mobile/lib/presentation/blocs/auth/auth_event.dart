@@ -16,6 +16,11 @@ class SignInEvent extends AuthEvent {
   @override
   List<Object> get props => [email, password];
 }
+class SignedIn extends AuthEvent {
+  final String token;
+  const SignedIn(this.token);
+}
+class AuthCheckRequested extends AuthEvent {}
 
 class ForgotPasswordEvent extends AuthEvent {
   final String email;

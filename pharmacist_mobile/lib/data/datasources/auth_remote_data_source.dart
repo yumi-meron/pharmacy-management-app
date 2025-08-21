@@ -1,8 +1,7 @@
 import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:dartz/dartz.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:pharmacist_mobile/core/constants/api_constants.dart';
 import 'package:pharmacist_mobile/core/error/failure.dart';
@@ -16,9 +15,9 @@ abstract class AuthRemoteDataSource {
 
 class RemoteDataSourceImpl extends AuthRemoteDataSource {
   final Dio dio;
-  final SharedPreferences prefs;
+  final FlutterSecureStorage secureStorage;
 
-  RemoteDataSourceImpl({required this.dio, required this.prefs});
+  RemoteDataSourceImpl({required this.dio, required this.secureStorage});
 
   @override
   Future<Either<Failure, UserModel>> signIn(
@@ -32,13 +31,14 @@ class RemoteDataSourceImpl extends AuthRemoteDataSource {
       if (response.statusCode == 200 && response.data['user'] != null) {
         final user = UserModel.fromJson(response.data['user']);
 
-        // Save user as JSON
-        await prefs.setString('user', jsonEncode(user.toJson()));
-        
-        // Save the token
+        // Save user as JSON securely
+        await secureStorage.write(
+            key: 'user', value: jsonEncode(user.toJson()));
+
+        // Save the token securely
         final token = response.data['token'];
         if (token != null) {
-          await prefs.setString('token', token);
+          await secureStorage.write(key: 'token', value: token);
         }
 
         return Right(user);

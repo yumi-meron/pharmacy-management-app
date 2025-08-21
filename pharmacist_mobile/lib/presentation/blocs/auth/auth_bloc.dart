@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pharmacist_mobile/core/error/failure.dart';
+import 'package:pharmacist_mobile/data/models/user_model.dart';
+import 'package:pharmacist_mobile/domain/entities/user.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/forgot_password.dart';
 import 'package:pharmacist_mobile/domain/usecases/auth/sign_in.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_event.dart';
@@ -8,13 +13,36 @@ import 'package:pharmacist_mobile/presentation/blocs/auth/auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignIn signIn;
   final ForgotPassword forgotPassword;
+  final _storage = const FlutterSecureStorage();
 
   AuthBloc({required this.signIn, required this.forgotPassword})
       : super(AuthInitial()) {
     on<SignInEvent>(_onSignIn);
     on<ForgotPasswordEvent>(_onForgotPassword);
     on<AuthLoggedOut>(_onLoggedOut);
+    on<AuthCheckRequested>(_onAuthCheckRequested);
   }
+  Future<void> _onAuthCheckRequested(
+    AuthCheckRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    final token = await _storage.read(key: "auth_token");
+
+    User? user;
+    final userJson = await _storage.read(key: "user");
+
+    if (userJson != null) {
+      user = UserModel.fromJson(jsonDecode(userJson)).toEntity();
+    }
+
+    if (token != null && user != null) {
+      emit(AuthAuthenticated(user));
+    } else {
+      emit(const AuthUnauthenticated());
+    }
+  }
+
+
 
   Future<void> _onSignIn(SignInEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());

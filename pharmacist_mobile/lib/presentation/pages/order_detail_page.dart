@@ -343,112 +343,115 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     );
   }
 }
-
-void showOtpConfirmationSheet(BuildContext context, OrderDetail order) {
+void showOtpConfirmationSheet(BuildContext parentContext, OrderDetail order) {
   final otpController = TextEditingController();
 
   showModalBottomSheet(
-    context: context,
+    context: parentContext,
     isScrollControlled: true,
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
-    builder: (context) {
-      final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    builder: (sheetContext) {
+      return BlocProvider.value(
+        value: BlocProvider.of<OtpVerifyBloc>(parentContext),
+        child: BlocBuilder<OtpVerifyBloc, OtpVerifyState>(
+          builder: (context, state) {
+            final bottomPadding = MediaQuery.of(sheetContext).viewInsets.bottom;
 
-      return BlocBuilder<OtpVerifyBloc, OtpVerifyState>(
-        builder: (context, state) {
-          return Padding(
-            padding: EdgeInsets.only(
-              left: 24,
-              right: 24,
-              top: 24,
-              bottom: bottomPadding + 24,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  "OTP Confirmation",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 24),
-                Pinput(
-                  length: 6,
-                  controller: otpController,
-                  defaultPinTheme: PinTheme(
-                    width: 50,
-                    height: 50,
-                    textStyle: const TextStyle(fontSize: 20),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 24,
+                bottom: bottomPadding + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "OTP Confirmation",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 24),
+                  Pinput(
+                    length: 6,
+                    controller: otpController,
+                    defaultPinTheme: PinTheme(
+                      width: 50,
+                      height: 50,
+                      textStyle: const TextStyle(fontSize: 20),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Didn't receive it yet? "),
-                    GestureDetector(
-                      onTap: () {
-                        // resend OTP
-                      },
-                      child: const Text(
-                        "Send OTP Again",
-                        style: TextStyle(
-                            color: Colors.teal, fontWeight: FontWeight.w500),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Didn't receive it yet? "),
+                      GestureDetector(
+                        onTap: () {
+                          // resend OTP
+                          
+                        },
+                        child: const Text(
+                          "Send OTP Again",
+                          style: TextStyle(
+                              color: Colors.teal, fontWeight: FontWeight.w500),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Cancel"),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(sheetContext),
+                          child: const Text("Cancel"),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: state is OtpVerifyLoading
-                            ? null
-                            : () {
-                                final otp = otpController.text.trim();
-                                if (otp.length == 6) {
-                                  context.read<OtpVerifyBloc>().add(
-                                        VerifyOrderOtpEvent(
-                                          id: order.id,
-                                          otp: otp,
-                                        ),
-                                      );
-                                }
-                              },
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal),
-                        child: state is OtpVerifyLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Text("Confirm"),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: state is OtpVerifyLoading
+                              ? null
+                              : () {
+                                  final otp = otpController.text.trim();
+                                  if (otp.length == 6) {
+                                    context.read<OtpVerifyBloc>().add(
+                                          VerifyOrderOtpEvent(
+                                            id: order.id,
+                                            otp: otp,
+                                          ),
+                                        );
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.teal),
+                          child: state is OtpVerifyLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text("Confirm"),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       );
     },
   );
