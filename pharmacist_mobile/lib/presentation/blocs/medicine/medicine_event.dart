@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:pharmacist_mobile/domain/entities/update_medicine.dart';
 
 abstract class MedicineEvent extends Equatable {
   const MedicineEvent();
@@ -16,6 +17,14 @@ class SearchMedicines extends MedicineEvent {
   List<Object> get props => [query];
 }
 
+class UpdateMedicineEvent extends MedicineEvent {
+  final UpdateMedicine medicine;
+
+  const UpdateMedicineEvent({required this.medicine});
+
+  @override
+  List<Object> get props => [medicine];
+}
 class FetchAllMedicines extends MedicineEvent {
   const FetchAllMedicines();
 }

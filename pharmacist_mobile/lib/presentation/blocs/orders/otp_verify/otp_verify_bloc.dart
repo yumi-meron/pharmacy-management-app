@@ -14,7 +14,7 @@ class OtpVerifyBloc extends Bloc<OtpVerifyEvent, OtpVerifyState> {
     required this.verifyOrderOtp,
   }) : super(OtpVerifyInitial()) {
     on<RequestOrderOtpEvent>((event, emit) async {
-      emit(OtpVerifyLoading());
+      emit(OtpRequestLoading());
       final res = await requestOrderOtp(event.id, event.phoneNumber);
       res.fold(
         (failure) => emit(OtpVerifyError(_mapFailureToMessage(failure))),

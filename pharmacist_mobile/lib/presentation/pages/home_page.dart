@@ -83,9 +83,9 @@ class _HomePageState extends State<HomePage> {
           SafeArea(
             child: BlocProvider(
               create: (context) => MedicineBloc(
-                getIt(),
                 repository: getIt(),
                 getMedicineDetails: getIt(),
+                updateMedicineUseCase: getIt(),
               )..add(const FetchAllMedicines()),
               child: BlocBuilder<MedicineBloc, MedicineState>(
                 builder: (context, state) {
@@ -204,10 +204,10 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                         // Content
-                                        Align(
+                                        const Align(
                                           alignment: Alignment.centerLeft,
                                           child: Padding(
-                                            padding: const EdgeInsets.only(
+                                            padding:  EdgeInsets.only(
                                               left: 16.0,
                                             ), // Add margin to the left
                                             child: Column(
@@ -215,7 +215,7 @@ class _HomePageState extends State<HomePage> {
                                                   CrossAxisAlignment.start,
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
-                                              children: const [
+                                              children:  [
                                                 Text(
                                                   'Love Care',
                                                   style: TextStyle(

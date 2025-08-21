@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:pharmacist_mobile/domain/entities/medicine.dart';
+import 'package:pharmacist_mobile/domain/entities/update_medicine.dart';
 
 abstract class MedicineState extends Equatable {
   const MedicineState();
@@ -21,6 +22,26 @@ class MedicineLoaded extends MedicineState {
   List<Object> get props => [medicines];
 }
 
+class MedicineUpdating extends MedicineState {}
+
+class MedicineUpdated extends MedicineState {
+  final UpdateMedicine medicine;
+
+  const MedicineUpdated(this.medicine);
+
+  @override
+  List<Object> get props => [medicine];
+}
+
+class MedicineUpdateError extends MedicineState {
+  final String message;
+
+  const MedicineUpdateError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class MedicineDetailsLoaded extends MedicineState {
   final Medicine medicine;
 
@@ -38,3 +59,4 @@ class MedicineError extends MedicineState {
   @override
   List<Object> get props => [message];
 }
+

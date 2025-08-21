@@ -126,13 +126,13 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
     try {
       final headers = await _getHeaders();
       final body = json.encode({'otp': otp});
-
+      print('with OTP: $otp');
       final response = await _client.post(
         Uri.parse('${ApiConstants.baseUrl}/api/orders/$id/verify'),
         headers: headers,
         body: body,
       );
-
+      print('Response status: ${response.statusCode}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right(unit);
       } else {

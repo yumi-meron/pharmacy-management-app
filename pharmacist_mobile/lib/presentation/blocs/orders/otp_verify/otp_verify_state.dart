@@ -8,7 +8,9 @@ abstract class OtpVerifyState extends Equatable {
 }
 class OtpVerifyInitial extends OtpVerifyState {}
 class OtpRequestSuccess extends OtpVerifyState {}
+class OtpRequestLoading extends OtpVerifyState{}
 class OtpVerifyLoading extends OtpVerifyState{}
+
 
 class OtpVerifySuccess extends OtpVerifyState {}
 
