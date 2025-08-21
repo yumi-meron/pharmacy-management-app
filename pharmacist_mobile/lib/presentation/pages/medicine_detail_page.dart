@@ -30,9 +30,8 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<MedicineBloc>(
-          create: (context) =>
-              getIt<MedicineBloc>()
-                ..add(GetMedicineDetailsEvent(widget.medicineId)),
+          create: (context) => getIt<MedicineBloc>()
+            ..add(GetMedicineDetailsEvent(widget.medicineId)),
         ),
         BlocProvider<CartBloc>(
           create: (_) =>
@@ -40,7 +39,6 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
         ),
       ],
       child: Scaffold(
-        
         body: BlocBuilder<MedicineBloc, MedicineState>(
           builder: (context, state) {
             if (state is MedicineLoading) {
@@ -122,23 +120,22 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                           .map(
                                             (variant) =>
                                                 DropdownMenuItem<String>(
-                                                  value: variant.unit,
-                                                  child: Text(
-                                                    '${variant.unit}',
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
+                                              value: variant.unit,
+                                              child: Text(
+                                                '${variant.unit}',
+                                                style: const TextStyle(
+                                                  fontSize: 12,
                                                 ),
+                                              ),
+                                            ),
                                           )
                                           .toList(),
                                       onChanged: (value) {
                                         setState(() {
-                                          selectedVariant = medicine.variants
-                                              .firstWhere(
-                                                (variant) =>
-                                                    variant.unit == value,
-                                              );
+                                          selectedVariant =
+                                              medicine.variants.firstWhere(
+                                            (variant) => variant.unit == value,
+                                          );
                                         });
                                       },
                                     ),
@@ -273,7 +270,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                   ),
                   // 🔹 Three-dot menu overlay (right)
                   Positioned(
-                    top: 16,
+                    top: 10,
                     right: 16,
                     child: BlocBuilder<AuthBloc, AuthState>(
                       builder: (context, state) {
@@ -283,7 +280,15 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                           if (user.role == 'owner' || user.role == 'admin') {
                             return PopupMenuButton<String>(
                               color: Colors.white,
-                              icon: const Icon(Icons.more_vert, color: Colors.white),
+                              icon: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.more_vert,
+                                    size: 14, color: Colors.white),
+                              ),
                               onSelected: (value) {
                                 if (value == "edit") {
                                   Navigator.push(
@@ -291,8 +296,10 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                     MaterialPageRoute(
                                       builder: (context) => BlocProvider(
                                         create: (_) => getIt<MedicineBloc>()
-                                          ..add(GetMedicineDetailsEvent(widget.medicineId)),
-                                        child: EditMedicinePage(medicineId: widget.medicineId),
+                                          ..add(GetMedicineDetailsEvent(
+                                              widget.medicineId)),
+                                        child: EditMedicinePage(
+                                            medicineId: widget.medicineId),
                                       ),
                                     ),
                                   );
@@ -314,7 +321,8 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                             );
                           }
                         }
-                        return const SizedBox.shrink(); // no menu for other roles
+                        return const SizedBox
+                            .shrink(); // no menu for other roles
                       },
                     ),
                   ),
@@ -336,8 +344,8 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     ElevatedButton(
                       onPressed: () {
                         context.read<MedicineBloc>().add(
-                          GetMedicineDetailsEvent(widget.medicineId),
-                        );
+                              GetMedicineDetailsEvent(widget.medicineId),
+                            );
                       },
                       child: const Text("Retry"),
                     ),
@@ -465,32 +473,33 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
   }
 
   Widget sectionTitle(String title) => Text(
-    title,
-    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-  );
+        title,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      );
 
   Widget sectionText(String text) => Text(
-    text,
-    style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.4),
-  );
+        text,
+        style:
+            const TextStyle(fontSize: 14, color: Colors.black87, height: 1.4),
+      );
 
   Widget sectionTextBullet(List<String> items) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: items
-        .map(
-          (item) => Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("• ", style: TextStyle(fontSize: 18)),
-                Expanded(
-                  child: Text(item, style: const TextStyle(fontSize: 14)),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: items
+            .map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("• ", style: TextStyle(fontSize: 18)),
+                    Expanded(
+                      child: Text(item, style: const TextStyle(fontSize: 14)),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        )
-        .toList(),
-  );
+              ),
+            )
+            .toList(),
+      );
 }

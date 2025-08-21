@@ -12,7 +12,6 @@ import 'package:pharmacist_mobile/presentation/blocs/employee/employee_state.dar
 import 'package:pharmacist_mobile/presentation/pages/sign_in_page.dart';
 import 'package:pharmacist_mobile/presentation/blocs/employee/employee_bloc.dart';
 
-
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -41,7 +40,8 @@ class SettingsPage extends StatelessWidget {
                   isScrollControlled: true,
                   backgroundColor: Colors.white,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(24)),
                   ),
                   builder: (context) {
                     final height = MediaQuery.of(context).size.height;
@@ -98,6 +98,7 @@ class SettingsPage extends StatelessWidget {
                 Navigator.of(context).pop();
               },
             ),
+            backgroundColor: Colors.white,
             actions: [
               TextButton(
                 onPressed: () async {
@@ -113,7 +114,8 @@ class SettingsPage extends StatelessWidget {
                         ),
                         TextButton(
                           onPressed: () => Navigator.of(ctx).pop(true),
-                          child: const Text("Logout", style: TextStyle(color: Colors.red)),
+                          child: const Text("Logout",
+                              style: TextStyle(color: Colors.red)),
                         ),
                       ],
                     ),
@@ -155,7 +157,8 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildUserCard(BuildContext context, User user, {VoidCallback? onEdit}) {
+  Widget _buildUserCard(BuildContext context, User user,
+      {VoidCallback? onEdit}) {
     return Stack(
       children: [
         Container(
@@ -187,7 +190,8 @@ class SettingsPage extends StatelessWidget {
                       width: 70,
                       height: 70,
                       color: Colors.grey[300],
-                      child: const Icon(Icons.person, size: 40, color: Colors.white),
+                      child: const Icon(Icons.person,
+                          size: 40, color: Colors.white),
                     );
                   },
                 ),
@@ -245,12 +249,8 @@ class SettingsPage extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildUserCard(
-            context,
-            user,
-            onEdit: () => _showEditProfileSheet(context, user)
-            
-          ),
+          _buildUserCard(context, user,
+              onEdit: () => _showEditProfileSheet(context, user)),
           const SizedBox(height: 30),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.7,
@@ -275,12 +275,15 @@ class SettingsPage extends StatelessWidget {
                           children: [
                             const Text(
                               "List of Employees",
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             ElevatedButton(
                               onPressed: () => _showAddEmployeeSheet(context),
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                              child: const Text("+ New Employee", style: TextStyle(color: Colors.teal)),
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white),
+                              child: const Text("+ New Employee",
+                                  style: TextStyle(color: Colors.teal)),
                             ),
                           ],
                         ),
@@ -290,7 +293,8 @@ class SettingsPage extends StatelessWidget {
                             hintText: "Search...",
                             prefixIcon: const Icon(Icons.search),
                             border: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Color.fromARGB(255, 208, 208, 208)),
+                              borderSide: const BorderSide(
+                                  color: Color.fromARGB(255, 208, 208, 208)),
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
@@ -301,85 +305,91 @@ class SettingsPage extends StatelessWidget {
                         const SizedBox(height: 10),
                         ...employees.map(
                           (employee) => ListTile(
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: Image.network(
-                                employee.picture,
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: 40,
-                                    height: 40,
-                                    color: Colors.grey[300],
-                                    child: const Icon(Icons.person, size: 24, color: Colors.white),
-                                  );
-                                },
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.network(
+                                  employee.picture,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 40,
+                                      height: 40,
+                                      color: Colors.grey[300],
+                                      child: const Icon(Icons.person,
+                                          size: 24, color: Colors.white),
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                            title: Text(employee.name),
-                            subtitle: Text(employee.role),
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return Dialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(24),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          CircleAvatar(
-                                            radius: 35,
-                                            backgroundImage: NetworkImage(employee.picture),
-                                          ),
-                                          const SizedBox(height: 12),
-                                          Text(
-                                            employee.name,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
+                              title: Text(employee.name),
+                              subtitle: Text(employee.role),
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return Dialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(24),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 35,
+                                              backgroundImage: NetworkImage(
+                                                  employee.picture),
                                             ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            employee.phoneNumber,
-                                            style: const TextStyle(fontSize: 14, color: Colors.black45),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            employee.role,
-                                            style: const TextStyle(fontSize: 14, color: Colors.black45),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          ElevatedButton(
-                                            onPressed: () => Navigator.pop(context),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.teal,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(16),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              employee.name,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            child: const Text(
-                                              "Close",
-                                              style: TextStyle(color: Colors.white),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              employee.phoneNumber,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.black45),
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              employee.role,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.black45),
+                                            ),
+                                            const SizedBox(height: 16),
+                                            ElevatedButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.teal,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
+                                              ),
+                                              child: const Text(
+                                                "Close",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              );
-                            }
-      
-                          ),
+                                    );
+                                  },
+                                );
+                              }),
                         )
-      
                       ],
                     );
                   }
@@ -446,137 +456,150 @@ void _showEditProfileSheet(BuildContext rootContext, User user) {
             top: 24,
             bottom: bottomPadding + 24,
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Center(
-                  child: Text(
-                    "Edit Profile",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Profile picture
-                Center(
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 55,
-                        backgroundImage: pictureFile != null
-                            ? FileImage(pictureFile!)
-                            : (user.picture != null && user.picture!.isNotEmpty)
-                                ? NetworkImage(user.picture!)
-                                : null,
-                        child: (user.picture == null ||
-                                user.picture!.isEmpty && pictureFile == null)
-                            ? Text(
-                                user.name.isNotEmpty
-                                    ? user.name[0].toUpperCase()
-                                    : "?",
-                                style: const TextStyle(
-                                    fontSize: 32, color: Colors.white),
-                              )
-                            : null,
+          child: Stack(
+            children: [
+              // Scrollable content
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Center(
+                      child: Text(
+                        "Edit Profile",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: InkWell(
-                          onTap: _pickImage,
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.teal,
+                    ),
+                    const SizedBox(height: 20),
+                    // Profile picture
+                    Center(
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 55,
+                            backgroundImage: pictureFile != null
+                                ? FileImage(pictureFile!)
+                                : (user.picture != null &&
+                                        user.picture!.isNotEmpty)
+                                    ? NetworkImage(user.picture!)
+                                    : null,
+                            child: (user.picture == null ||
+                                    user.picture!.isEmpty &&
+                                        pictureFile == null)
+                                ? Text(
+                                    user.name.isNotEmpty
+                                        ? user.name[0].toUpperCase()
+                                        : "?",
+                                    style: const TextStyle(
+                                        fontSize: 32, color: Colors.white),
+                                  )
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: InkWell(
+                              onTap: _pickImage,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.teal,
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  size: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.camera_alt,
-                              size: 20,
-                              color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    // Name field
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: "Full Name",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Phone field
+                    TextField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText: "Phone Number",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                        height: 100), // Extra padding to avoid button overlap
+                  ],
+                ),
+              ),
+              // Fixed buttons at bottom
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: bottomPadding,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
                             ),
+                          ),
+                          child: const Text("Cancel"),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final updatedUser = user.copyWith(
+                              name: nameController.text.trim(),
+                              phoneNumber: phoneController.text.trim(),
+                              picture: pictureFile?.path ?? user.picture,
+                            );
+                            // Dispatch event to update user
+                            // rootContext
+                            //     .read<AuthBloc>()
+                            //     .add(UpdateProfile(user: updatedUser));
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.teal,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
+                          child: const Text(
+                            "Save",
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 30),
-
-                // Name field
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: "Full Name",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Phone field
-                TextField(
-                  controller: phoneController,
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: "Phone Number",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 80),
-
-                // Action buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                        ),
-                        child: const Text("Cancel"),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          final updatedUser = user.copyWith(
-                            name: nameController.text.trim(),
-                            phoneNumber: phoneController.text.trim(),
-                            // If user picked new image, save file path (or upload later)
-                            picture: pictureFile?.path ?? user.picture,
-                          );
-
-                          // Dispatch event to update user
-                          // rootContext
-                          //     .read<AuthBloc>()
-                          //     .add(UpdateProfile(user: updatedUser));
-
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                        ),
-                        child: const Text(
-                          "Save",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       });
@@ -627,7 +650,8 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
                   controller: nameController,
                   decoration: const InputDecoration(
                     labelText: "Full Name",
-                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(16))),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -642,7 +666,7 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
                   ),
                 ),
                 const SizedBox(height: 20),
-                                TextField(
+                TextField(
                   controller: passwordController,
                   obscureText: obscurePassword,
                   decoration: InputDecoration(
@@ -652,7 +676,9 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                       ),
                       onPressed: () {
                         setState(() {
@@ -672,7 +698,8 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
                     ),
                   ),
                   items: const [
-                    DropdownMenuItem(value: 'pharmacist', child: Text("Pharmacist")),
+                    DropdownMenuItem(
+                        value: 'pharmacist', child: Text("Pharmacist")),
                     DropdownMenuItem(value: 'admin', child: Text("Admin")),
                   ],
                   onChanged: (value) {
@@ -747,5 +774,3 @@ void _showAddEmployeeSheet(BuildContext rootContext) {
     },
   );
 }
-
-                   
