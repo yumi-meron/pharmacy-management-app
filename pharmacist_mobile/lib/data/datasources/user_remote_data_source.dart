@@ -19,7 +19,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   UserRemoteDataSourceImpl(this._client, this._storage);
 
   Future<Map<String, String>> _getHeaders() async {
-    final token = await _storage.read(key: "auth_token");
+    final token = await _storage.read(key: "token");
     if (token == null) throw Exception("No auth token found");
 
     return {

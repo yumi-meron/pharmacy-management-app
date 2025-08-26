@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:pharmacist_mobile/domain/entities/medicine.dart';
 import 'package:pharmacist_mobile/domain/entities/update_medicine.dart';
 
 abstract class MedicineEvent extends Equatable {
@@ -7,6 +8,15 @@ abstract class MedicineEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class ScanBarcodeEvent extends MedicineEvent {
+  final String barcode;
+  const ScanBarcodeEvent(this.barcode);
+
+  @override
+  List<Object> get props => [barcode];
+}
+
 
 class SearchMedicines extends MedicineEvent {
   final String query;
@@ -37,6 +47,15 @@ class FetchMedicineDetails extends MedicineEvent {
   @override
   List<Object> get props => [id];
 }
+class AlreadyFetchedMedicineEvent extends MedicineEvent {
+  final Medicine medicine;
+
+  const AlreadyFetchedMedicineEvent(this.medicine);
+
+  @override
+  List<Object> get props => [medicine];
+}
+
 
 class GetMedicineDetailsEvent extends MedicineEvent {
   final String medicineId;

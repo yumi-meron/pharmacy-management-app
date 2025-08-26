@@ -16,8 +16,21 @@ class MedicineRepositoryImpl implements MedicineRepository {
     required this.networkInfo,
   });
 
+ 
   @override
-  Future<Either<Failure, UpdateMedicine>> updateMedicine(UpdateMedicine medicine) async {
+  Future<Either<Failure, Medicine>> getMedicineByBarcode(String barcode) async {
+    try {
+      final model = await dataSource.getMedicineByBarcode(barcode);
+      return Right(model.toEntity());
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+
+  @override
+  Future<Either<Failure, UpdateMedicine>> updateMedicine(
+      UpdateMedicine medicine) async {
     try {
       final model = UpdateMedicineModel(
         id: medicine.id,
@@ -34,6 +47,7 @@ class MedicineRepositoryImpl implements MedicineRepository {
       );
 
       final result = await dataSource.updateMedicine(model);
+      print(result);
 
       return Right(result);
     } catch (e) {
@@ -58,6 +72,7 @@ class MedicineRepositoryImpl implements MedicineRepository {
       return const Left(ConnectionFailure('No internet connection'));
     }
   }
+
   @override
   Future<Either<Failure, List<Medicine>>> getAllMedicines() async {
     if (await networkInfo.isConnected) {

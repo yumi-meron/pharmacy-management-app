@@ -26,6 +26,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthCheckRequested event,
     Emitter<AuthState> emit,
   ) async {
+    print('checking auth status...');
     final token = await _storage.read(key: "auth_token");
 
     User? user;

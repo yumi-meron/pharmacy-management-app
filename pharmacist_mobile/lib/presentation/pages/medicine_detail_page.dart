@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pharmacist_mobile/domain/entities/medicine.dart';
 import 'package:pharmacist_mobile/domain/entities/medicine_variant.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_state.dart';
@@ -13,9 +14,16 @@ import 'package:pharmacist_mobile/presentation/blocs/cart/cart_event.dart';
 import 'package:pharmacist_mobile/presentation/pages/edit_medicine_page.dart';
 
 class MedicineDetailPage extends StatefulWidget {
-  final String medicineId;
+  final String? medicineId;
+    final Medicine? medicine; // Pass this if coming from scanner
 
-  const MedicineDetailPage({super.key, required this.medicineId});
+
+  const MedicineDetailPage({
+    super.key,
+    this.medicineId,
+    this.medicine,
+  }) : assert(medicineId != null || medicine != null, 
+        "Either medicineId or medicine must be provided");
 
   @override
   _MedicineDetailPageState createState() => _MedicineDetailPageState();
@@ -30,8 +38,17 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<MedicineBloc>(
-          create: (context) => getIt<MedicineBloc>()
-            ..add(GetMedicineDetailsEvent(widget.medicineId)),
+          create: (context) {
+            final bloc = getIt<MedicineBloc>();
+            if (widget.medicine != null) {
+              // Inject state directly (no API call)
+              bloc.add(AlreadyFetchedMedicineEvent(widget.medicine!));
+            } else if (widget.medicineId != null) {
+              // Fetch from backend
+              bloc.add(GetMedicineDetailsEvent(widget.medicineId!));
+            }
+            return bloc;
+          },
         ),
         BlocProvider<CartBloc>(
           create: (_) =>
@@ -48,6 +65,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
 
               // Initialize the selected variant if not already set
               selectedVariant ??= medicine.variants.first;
+              final id = widget.medicineId ?? widget.medicine!.id;
 
               return Stack(
                 children: [
@@ -250,7 +268,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
 
                   // Back button overlay
                   Positioned(
-                    top: 10,
+                    top: 30,
                     left: 16,
                     child: GestureDetector(
                       onTap: () => Navigator.of(context).pop(),
@@ -263,14 +281,14 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         child: const Icon(
                           Icons.arrow_back,
                           color: Colors.white,
-                          size: 14,
+                          size: 20,
                         ),
                       ),
                     ),
                   ),
                   // 🔹 Three-dot menu overlay (right)
                   Positioned(
-                    top: 10,
+                    top: 30,
                     right: 16,
                     child: BlocBuilder<AuthBloc, AuthState>(
                       builder: (context, state) {
@@ -287,7 +305,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(Icons.more_vert,
-                                    size: 14, color: Colors.white),
+                                    size: 20, color: Colors.white),
                               ),
                               onSelected: (value) {
                                 if (value == "edit") {
@@ -297,9 +315,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                       builder: (context) => BlocProvider(
                                         create: (_) => getIt<MedicineBloc>()
                                           ..add(GetMedicineDetailsEvent(
-                                              widget.medicineId)),
+                                              id)),
                                         child: EditMedicinePage(
-                                            medicineId: widget.medicineId),
+                                            medicineId: id),
                                       ),
                                     ),
                                   );
@@ -329,6 +347,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 ],
               );
             } else if (state is MedicineError) {
+              final id = widget.medicineId ?? widget.medicine!.id;
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -344,7 +363,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     ElevatedButton(
                       onPressed: () {
                         context.read<MedicineBloc>().add(
-                              GetMedicineDetailsEvent(widget.medicineId),
+                              GetMedicineDetailsEvent(id),
                             );
                       },
                       child: const Text("Retry"),
@@ -405,7 +424,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
               // Add to Cart Button
               SizedBox(
                 width: 200,
-                height: 35, // Fixed width of 50
+                height: 45, // Fixed width of 50
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF01C587), // Updated color

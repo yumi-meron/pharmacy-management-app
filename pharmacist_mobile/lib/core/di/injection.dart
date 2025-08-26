@@ -11,6 +11,7 @@ import 'package:pharmacist_mobile/data/datasources/employee_remote_datasource.da
 import 'package:pharmacist_mobile/data/datasources/medicine_remote_data_source.dart';
 import 'package:pharmacist_mobile/data/datasources/cart_remote_data_source.dart';
 import 'package:pharmacist_mobile/data/datasources/orders_remote_data_source.dart';
+import 'package:pharmacist_mobile/data/datasources/user_remote_data_source.dart';
 
 // Repositories
 import 'package:pharmacist_mobile/data/repositories/auth_repository_impl.dart';
@@ -18,6 +19,7 @@ import 'package:pharmacist_mobile/data/repositories/employee_repository_impl.dar
 import 'package:pharmacist_mobile/data/repositories/medicine_repository_impl.dart';
 import 'package:pharmacist_mobile/data/repositories/cart_repository_impl.dart';
 import 'package:pharmacist_mobile/data/repositories/orders_repository_impl.dart';
+import 'package:pharmacist_mobile/data/repositories/user_repository_impl.dart';
 
 // Domain Repositories
 import 'package:pharmacist_mobile/domain/repositories/auth_repository.dart';
@@ -25,6 +27,8 @@ import 'package:pharmacist_mobile/domain/repositories/employee_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/medicine_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/cart_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/orders_repository.dart';
+import 'package:pharmacist_mobile/domain/repositories/user_repository.dart';
+import 'package:pharmacist_mobile/domain/usecases/medicine/barcode_get_medicine.dart';
 
 // Usecases
 import 'package:pharmacist_mobile/domain/usecases/medicine/update_medicine_usecase.dart';
@@ -45,6 +49,7 @@ import 'package:pharmacist_mobile/domain/usecases/cart/get_cart_items.dart';
 import 'package:pharmacist_mobile/domain/usecases/cart/remove_cart_item.dart';
 import 'package:pharmacist_mobile/domain/usecases/cart/add_cart_item.dart';
 import 'package:pharmacist_mobile/domain/usecases/cart/check_out.dart';
+import 'package:pharmacist_mobile/domain/usecases/user/update_profile_usecase.dart';
 
 // Blocs
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
@@ -54,18 +59,17 @@ import 'package:pharmacist_mobile/presentation/blocs/cart/cart_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detail_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/orders_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/otp_verify/otp_verify_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/user/user_bloc.dart';
 
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 final GetIt getIt = GetIt.instance;
 
 Future<void> setup() async {
   // External dependencies
-  final sharedPrefs = await SharedPreferences.getInstance();
   const sharedStorage = FlutterSecureStorage();
 
   getIt.registerSingleton<FlutterSecureStorage>(sharedStorage);
-  getIt.registerSingleton<SharedPreferences>(sharedPrefs);
   getIt.registerSingleton<Dio>(Dio());
   getIt.registerSingleton<http.Client>(http.Client());
   getIt.registerSingleton<InternetConnectionChecker>(
@@ -79,21 +83,24 @@ Future<void> setup() async {
   getIt.registerSingleton<AuthRemoteDataSource>(
     RemoteDataSourceImpl(dio: getIt(), secureStorage: getIt()),
   );
+  getIt.registerSingleton<UserRemoteDataSource>(
+  UserRemoteDataSourceImpl(getIt<http.Client>(), getIt()),
+  );
 
   getIt.registerSingleton<MedicineRemoteDataSource>(
-    MedicineRemoteDataSourceImpl(client: getIt(), prefs: getIt()),
+    MedicineRemoteDataSourceImpl(client: getIt(), storage: getIt()),
   );
 
   getIt.registerSingleton<EmployeeDataSource>(
-    EmployeeDataSourceImpl(prefs: getIt()),
+    EmployeeDataSourceImpl(storage: getIt()),
   );
 
   getIt.registerSingleton<CartRemoteDataSource>(
-    CartRemoteDataSourceImpl(dio: getIt(), prefs: getIt()),
+    CartRemoteDataSourceImpl(dio: getIt(), storage: getIt()),
   );
 
   getIt.registerSingleton<OrdersRemoteDataSource>(
-    OrdersRemoteDataSourceImpl(prefs: getIt(), client: getIt()),
+    OrdersRemoteDataSourceImpl(storage: getIt(), client: getIt()),
   );
 
   // Repositories
@@ -108,6 +115,9 @@ Future<void> setup() async {
   getIt.registerSingleton<EmployeeRepository>(
     EmployeeRepositoryImpl(dataSource: getIt()),
   );
+  getIt.registerSingleton<UserRepository>(
+  UserRepositoryImpl(getIt()),
+  );
 
   getIt.registerSingleton<CartRepository>(
     CartRepositoryImpl(getIt(), getIt()),
@@ -121,10 +131,14 @@ Future<void> setup() async {
   getIt.registerSingleton<SignIn>(SignIn(getIt()));
   getIt.registerSingleton<ForgotPassword>(ForgotPassword(getIt()));
 
+  //User Usecase
+  getIt.registerLazySingleton(() => UpdateProfile(getIt()));
+
   // Medicine use cases
   getIt.registerLazySingleton(() => GetMedicineDetails(getIt()));
   getIt.registerLazySingleton(() => SearchMedicines(getIt()));
   getIt.registerLazySingleton(() => UpdateMedicineUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetMedicineByBarcode(getIt()));
 
   // Orders use cases
   getIt.registerLazySingleton(() => GetOrders(getIt()));
@@ -143,6 +157,10 @@ Future<void> setup() async {
         signIn: getIt(),
         forgotPassword: getIt(),
       ));
+
+  getIt.registerFactory(() => ProfileBloc(
+      updateProfileUseCase: getIt<UpdateProfile>(),
+    ));
 
   getIt.registerFactory(() => MedicineBloc(
         repository: getIt<MedicineRepository>(),

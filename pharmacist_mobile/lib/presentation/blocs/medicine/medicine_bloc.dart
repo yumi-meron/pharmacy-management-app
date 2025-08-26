@@ -21,7 +21,22 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
     on<GetMedicineDetailsEvent>(_onGetMedicineDetailsEvent);
     on<FetchAllMedicines>(_onFetchAllMedicines);
     on<UpdateMedicineEvent>(_onUpdateMedicine);
+    on<ScanBarcodeEvent>(_onScanBarcode);
+    on<AlreadyFetchedMedicineEvent>((event, emit) {
+      emit(MedicineDetailsLoaded(event.medicine));
+    });
   }
+
+  Future<void> _onScanBarcode(
+      ScanBarcodeEvent event, Emitter<MedicineState> emit) async {
+    emit(MedicineLoading());
+    final result = await repository.getMedicineByBarcode(event.barcode);
+    result.fold(
+      (failure) => emit(MedicineError(_mapFailureToMessage(failure))),
+      (medicine) => emit(MedicineDetailsLoaded(medicine)),
+    );
+  }
+  
   Future<void> _onUpdateMedicine(
     UpdateMedicineEvent event,
     Emitter<MedicineState> emit,
@@ -66,6 +81,8 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
       (medicine) => emit(MedicineDetailsLoaded(medicine)),
     );
   }
+ 
+
 
   String _mapFailureToMessage(Failure failure) {
     if (failure is ConnectionFailure) {

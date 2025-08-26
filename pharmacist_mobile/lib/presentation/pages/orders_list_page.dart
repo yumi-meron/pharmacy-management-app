@@ -45,7 +45,6 @@ class _OrdersListPageState extends State<OrdersListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Column(
         children: [
           Padding(
@@ -77,7 +76,6 @@ class _OrdersListPageState extends State<OrdersListPage> {
                   borderSide: BorderSide(
                     color: Colors.grey
                         .shade300, // Light grey border color for enabled state
-
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -97,123 +95,133 @@ class _OrdersListPageState extends State<OrdersListPage> {
           Expanded(
             child: BlocBuilder<OrdersBloc, OrdersState>(
               builder: (context, state) {
-                if (state is OrdersLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is OrdersLoaded) {
-                  _allOrders = state.orders.cast<OrderEntity>();
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    context.read<OrdersBloc>().add(LoadOrdersEvent());
+                  },
+                  child: () {
+                    if (state is OrdersLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is OrdersLoaded) {
+                      _allOrders = state.orders.cast<OrderEntity>();
 
-                  if (_filteredOrders.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No orders found.',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    );
-                  }
+                      // If no search applied yet, show all orders
+                      if (_searchController.text.isEmpty) {
+                        _filteredOrders = _allOrders;
+                      }
 
-                  return ListView.separated(
-                    padding: const EdgeInsets.all(18),
-                    itemCount: _filteredOrders.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final order = _filteredOrders[index];
-                      final hospitalInitials = order.hospitalName
-                          .split(' ')
-                          .where((word) => word.isNotEmpty)
-                          .take(2)
-                          .map((word) => word[0])
-                          .join()
-                          .toUpperCase(); // Extract initials (e.g., "City Health Hospital" -> "CH")
-
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(8),
-                          leading: CircleAvatar(
-                            radius: 30,
-                            backgroundColor: Colors.grey.shade100,
-                            child: Text(
-                              hospitalInitials,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
+                      if (_filteredOrders.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No orders found.',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                order.hospitalName,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                        );
+                      }
+
+                      return ListView.separated(
+                        padding: const EdgeInsets.all(18),
+                        itemCount: _filteredOrders.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final order = _filteredOrders[index];
+                          final hospitalInitials = order.hospitalName
+                              .split(' ')
+                              .where((word) => word.isNotEmpty)
+                              .take(2)
+                              .map((word) => word[0])
+                              .join()
+                              .toUpperCase();
+
+                          return Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(8),
+                              leading: CircleAvatar(
+                                radius: 30,
+                                backgroundColor: Colors.grey.shade100,
+                                child: Text(
+                                  hospitalInitials,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 6),
-                            ],
-                          ),
-                          subtitle: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Patient: ${order.patientName}',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              Text(
-                                DateFormat('d MMM yyyy')
-                                    .format(order.orderDate),
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => MultiBlocProvider(
-                                  providers: [
-                                    BlocProvider<OtpVerifyBloc>(
-                                      create: (_) => OtpVerifyBloc(
-                                        requestOrderOtp: getIt(),
-                                        verifyOrderOtp: getIt(),
-                                      ),
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    order.hospitalName,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                    BlocProvider.value(
-                                      value: context.read<OrderDetailBloc>(),
-                                    ),
-                                  ],
-                                  child: OrderDetailPage(orderId: order.id),
-                                ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                ],
                               ),
-                            );
-                          },
-
-
+                              subtitle: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Patient: ${order.patientName}',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  Text(
+                                    DateFormat('d MMM yyyy').format(order.orderDate),
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MultiBlocProvider(
+                                      providers: [
+                                        BlocProvider<OtpVerifyBloc>(
+                                          create: (_) => OtpVerifyBloc(
+                                            requestOrderOtp: getIt(),
+                                            verifyOrderOtp: getIt(),
+                                          ),
+                                        ),
+                                        BlocProvider.value(
+                                          value: context.read<OrderDetailBloc>(),
+                                        ),
+                                      ],
+                                      child: OrderDetailPage(orderId: order.id),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      );
+                    }
+                    else if (state is OrdersError) {
+                      return Center(
+                        child: Text(
+                          'Error: ${state.message}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.red,
+                          ),
                         ),
                       );
-                    },
-                  );
-                } else if (state is OrdersError) {
-                  return Center(
-                    child: Text(
-                      'Error: ${state.message}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.red,
-                      ),
-                    ),
-                  );
-                }
-                return const SizedBox();
+                    }
+                    return const SizedBox();
+                  }(),
+                );
               },
             ),
           ),

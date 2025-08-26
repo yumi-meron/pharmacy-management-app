@@ -8,4 +8,6 @@ abstract class MedicineRepository {
   Future<Either<Failure, Medicine>> getMedicineDetails(String id);
   Future<Either<Failure, List<Medicine>>> getAllMedicines();
   Future<Either<Failure, UpdateMedicine>> updateMedicine(UpdateMedicine medicine);
+  Future<Either<Failure, Medicine>> getMedicineByBarcode(String barcode);
+
 }

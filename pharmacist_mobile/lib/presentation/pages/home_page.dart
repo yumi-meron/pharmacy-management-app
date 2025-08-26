@@ -6,6 +6,7 @@ import 'package:pharmacist_mobile/presentation/blocs/auth/auth_state.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_state.dart';
+import 'package:pharmacist_mobile/presentation/pages/barcode_scanner_page.dart';
 import 'package:pharmacist_mobile/presentation/pages/cart_page.dart';
 import 'package:pharmacist_mobile/presentation/pages/inventory_page.dart';
 import 'package:pharmacist_mobile/presentation/pages/orders_list_page.dart';
@@ -98,242 +99,239 @@ class _HomePageState extends State<HomePage> {
                         child: Column(
                           children: [
                             Expanded(
-                              child: ListView(
-                                children: [
-                                  const SizedBox(height: 20),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 10.0,
-                                    ),
-                                    child: TextField(
-                                      decoration: InputDecoration(
-                                        hintText: 'Search medicines...',
-                                        hintStyle: const TextStyle(
-                                          color: Colors.grey,
-                                        ),
-                                        prefixIcon: const Icon(
-                                          Icons.search,
-                                          color: Colors.grey,
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              vertical: 0,
-                                              horizontal: 16,
-                                            ),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Color(
-                                              0xFFD3D3D3,
-                                            ), // Light grey border
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Color(
-                                              0xFFD3D3D3,
-                                            ), // Light grey border
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Colors
-                                                .teal, // Teal border when focused
-                                            width: 1.5,
-                                          ),
-                                        ),
+                              child: RefreshIndicator(
+                                onRefresh: () async {
+                                  context
+                                      .read<MedicineBloc>()
+                                      .add(const FetchAllMedicines());
+                                },
+                                child: ListView(
+                                  children: [
+                                    const SizedBox(height: 20),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10.0,
                                       ),
-                                      onChanged: (query) => context
-                                          .read<MedicineBloc>()
-                                          .add(SearchMedicines(query)),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Container(
-                                    height: 120,
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(0),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Stack(
-                                      children: [
-                                        // Background Image
-                                        Container(
-                                          decoration: BoxDecoration(
+                                      child: TextField(
+                                        decoration: InputDecoration(
+                                          hintText: 'Search medicines...',
+                                          hintStyle: const TextStyle(
+                                            color: Colors.grey,
+                                          ),
+                                          prefixIcon: const Icon(
+                                            Icons.search,
+                                            color: Colors.grey,
+                                          ),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                            vertical: 0,
+                                            horizontal: 16,
+                                          ),
+                                          border: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(
                                               16,
                                             ),
-                                            image: const DecorationImage(
-                                              image: AssetImage(
-                                                'assets/images/pharmacy_background.png',
-                                              ),
-                                              fit: BoxFit.cover,
+                                            borderSide: const BorderSide(
+                                              color: Color(0xFFD3D3D3),
+                                              width: 1.0,
                                             ),
                                           ),
-                                        ),
-                                        // Gradient Overlay
-                                        Container(
-                                          decoration: BoxDecoration(
+                                          enabledBorder: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(
-                                              10,
+                                              16,
                                             ),
-                                            gradient: const LinearGradient(
-                                              begin: Alignment.centerLeft,
-                                              end: Alignment.centerRight,
-                                              colors: [
-                                                Color(
-                                                  0xFF004D40,
-                                                ), // Solid color on the left
-                                                Colors.teal,
-                                                Color(
-                                                  0x30000000,
-                                                ), // Fully transparent on the right
-                                              ],
+                                            borderSide: const BorderSide(
+                                              color: Color(0xFFD3D3D3),
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Colors.teal,
+                                              width: 1.5,
                                             ),
                                           ),
                                         ),
-                                        // Content
-                                        const Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Padding(
-                                            padding:  EdgeInsets.only(
-                                              left: 16.0,
-                                            ), // Add margin to the left
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children:  [
-                                                Text(
-                                                  'Love Care',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  'Pharmacy',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  const Text(
-                                    'Categories',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  SizedBox(
-                                    height: 40,
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children:
-                                            [
-                                                  'Antibiotics',
-                                                  'Vitamins',
-                                                  'Pain Relief',
-                                                  'Cold & Flu',
-                                                ]
-                                                .map(
-                                                  (cat) => Padding(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                          horizontal: 6.0,
-                                                        ),
-                                                    child: ElevatedButton(
-                                                      style: ElevatedButton.styleFrom(
-                                                        backgroundColor:
-                                                            Colors.white,
-                                                        foregroundColor:
-                                                            Colors.black,
-                                                        elevation:
-                                                            0, // Remove shadow
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                80,
-                                                              ),
-                                                          side: const BorderSide(
-                                                            color: Color(
-                                                              0xFFD3D3D3,
-                                                            ), // Light grey border
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      onPressed: () {},
-                                                      child: Text(
-                                                        cat,
-                                                        style: const TextStyle(
-                                                          fontWeight: FontWeight
-                                                              .w500, // Set text weight to w300
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                                .toList(),
+                                        // onChanged: (query) => context
+                                        //     .read<MedicineBloc>()
+                                        //     .add(SearchMedicines(query)),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 30),
-                                  const Text(
-                                    'Recent purchases',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                    const SizedBox(height: 20),
+                                    Container(
+                                      height: 120,
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(0),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Stack(
+                                        children: [
+                                          // Background Image
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              image: const DecorationImage(
+                                                image: AssetImage(
+                                                  'assets/images/pharmacy_background.png',
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          // Gradient Overlay
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              gradient: const LinearGradient(
+                                                begin: Alignment.centerLeft,
+                                                end: Alignment.centerRight,
+                                                colors: [
+                                                  Color(0xFF004D40),
+                                                  Colors.teal,
+                                                  Color(0x30000000),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          // Content
+                                          const Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 16.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    'Love Care',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'Pharmacy',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  if (state is MedicineLoading)
-                                    const Center(
-                                      child: CircularProgressIndicator(),
-                                    )
-                                  else if (state is MedicineError)
-                                    Text('Error: ${state.message}')
-                                  else if (state is MedicineLoaded)
+                                    const SizedBox(height: 20),
+                                    const Text(
+                                      'Categories',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
                                     SizedBox(
-                                      height: 260,
+                                      height: 40,
                                       child: SingleChildScrollView(
                                         scrollDirection: Axis.horizontal,
                                         child: Row(
-                                          children: state.medicines.map((
-                                            medicine,
-                                          ) {
-                                            return MedicineWidget(
-                                              medicine: medicine,
-                                            );
-                                          }).toList(),
+                                          children: [
+                                            'Antibiotics',
+                                            'Vitamins',
+                                            'Pain Relief',
+                                            'Cold & Flu',
+                                          ]
+                                              .map(
+                                                (cat) => Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal: 6.0,
+                                                  ),
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      foregroundColor:
+                                                          Colors.black,
+                                                      elevation: 0,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(80),
+                                                        side: const BorderSide(
+                                                          color:
+                                                              Color(0xFFD3D3D3),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onPressed: () {},
+                                                    child: Text(
+                                                      cat,
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
                                         ),
                                       ),
-                                    )
-                                  else
-                                    const SizedBox.shrink(),
-                                ],
+                                    ),
+                                    const SizedBox(height: 30),
+                                    const Text(
+                                      'Recent purchases',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    if (state is MedicineLoading)
+                                      const Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(20.0),
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      )
+                                    else if (state is MedicineError)
+                                      Text('Error: ${state.message}')
+                                    else if (state is MedicineLoaded)
+                                      SizedBox(
+                                        height: 260,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            children: state.medicines
+                                                .map((medicine) {
+                                              return MedicineWidget(
+                                                medicine: medicine,
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      )
+                                    else
+                                      const SizedBox.shrink(),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -369,24 +367,31 @@ class _HomePageState extends State<HomePage> {
             right: 0,
             bottom: 20,
             child: Center(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.teal,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.qr_code_scanner,
-                  size: 30,
-                  color: Colors.white,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => const BarcodeScannerPage(),
+                  ));
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.teal,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.qr_code_scanner,
+                    size: 30,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

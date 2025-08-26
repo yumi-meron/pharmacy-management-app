@@ -38,7 +38,7 @@ class _InventoryPageState extends State<InventoryPage> {
 
   int _calculateCrossAxisCount(double screenWidth) {
     const double cardWidth = 180;
-    return (screenWidth / cardWidth).floor().clamp(2, 4); // keep it between 2 and 4 cards per row
+    return (screenWidth / cardWidth).floor().clamp(2, 4);
   }
 
   @override
@@ -48,7 +48,6 @@ class _InventoryPageState extends State<InventoryPage> {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          // backgroundColor: Colors.grey[200],
           elevation: 0,
           toolbarHeight: 70,
           title: TextField(
@@ -67,52 +66,72 @@ class _InventoryPageState extends State<InventoryPage> {
           ),
           actions: [
             Padding(
-              padding: const EdgeInsets.only(left: 2.0, right: 16.0 ),
+              padding: const EdgeInsets.only(left: 2.0, right: 16.0),
               child: IconButton(
-               icon: const Icon(Icons.shopping_cart),
+                icon: const Icon(Icons.shopping_cart),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) =>  CartPage()),
+                    MaterialPageRoute(builder: (context) => CartPage()),
                   );
                 },
               ),
             ),
-          ]
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: BlocBuilder<MedicineBloc, MedicineState>(
-                builder: (context, state) {
-                  if (state is MedicineLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is MedicineError) {
-                    return Center(child: Text('Error: ${state.message}'));
-                  } else if (state is MedicineLoaded) {
-                    final screenWidth = MediaQuery.of(context).size.width;
-                    final crossAxisCount = _calculateCrossAxisCount(screenWidth);
-
-                    return GridView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        mainAxisSpacing: 20,
-                        crossAxisSpacing: 20,
-                        childAspectRatio: 0.85,
-                      ),
-                      itemCount: state.medicines.length,
-                      itemBuilder: (context, index) {
-                        return MedicineWidget(medicine: state.medicines[index]);
-                      },
-                    );
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                },
-              ),
-            ),
           ],
+        ),
+        body: BlocBuilder<MedicineBloc, MedicineState>(
+          builder: (context, state) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<MedicineBloc>().add(const FetchAllMedicines());
+              },
+              child: () {
+                if (state is MedicineLoading) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: const [
+                      SizedBox(height: 300),
+                      Center(child: CircularProgressIndicator()),
+                    ],
+                  );
+                } else if (state is MedicineError) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      const SizedBox(height: 300),
+                      Center(child: Text('Error: ${state.message}')),
+                    ],
+                  );
+                } else if (state is MedicineLoaded) {
+                  final screenWidth = MediaQuery.of(context).size.width;
+                  final crossAxisCount = _calculateCrossAxisCount(screenWidth);
+
+                  return GridView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 20,
+                      crossAxisSpacing: 20,
+                      childAspectRatio: 0.85,
+                    ),
+                    itemCount: state.medicines.length,
+                    itemBuilder: (context, index) {
+                      return MedicineWidget(medicine: state.medicines[index]);
+                    },
+                  );
+                } else {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: const [
+                      SizedBox(height: 300),
+                      Center(child: Text('No data')),
+                    ],
+                  );
+                }
+              }(),
+            );
+          },
         ),
         bottomNavigationBar: Stack(
           alignment: Alignment.bottomCenter,
