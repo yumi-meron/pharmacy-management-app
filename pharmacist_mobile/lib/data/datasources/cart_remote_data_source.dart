@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:dartz/dartz.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:pharmacist_mobile/core/constants/api_constants.dart';
 import 'package:pharmacist_mobile/core/error/failure.dart';
@@ -18,16 +18,18 @@ abstract class CartRemoteDataSource {
 
 class CartRemoteDataSourceImpl implements CartRemoteDataSource {
   final Dio dio;
-  final SharedPreferences prefs;
+  final FlutterSecureStorage storage;
 
-  CartRemoteDataSourceImpl({required this.dio, required this.prefs});
+  CartRemoteDataSourceImpl({required this.dio, required this.storage});
 
   Future<Map<String, dynamic>> _getHeaders() async {
-    final token = prefs.getString('token');
-    final userJson = prefs.getString('user');
+    final token = await storage.read(key: "token");
+    //wait secureStorage.write(
+           // key: 'user', value: jsonEncode(user.toJson()));
+    final userJson = await storage.read(key: 'user')?? '';
 
     if (token == null) throw Exception('No token found');
-    if (userJson == null) throw Exception('No user data found');
+    if (userJson == '') throw Exception('No user data found');
 
     final user = UserModel.fromJson(jsonDecode(userJson));
 

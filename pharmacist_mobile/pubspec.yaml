@@ -9,7 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-    
+  
+  mobile_scanner: ^6.0.1
   image_picker: ^1.0.7
   flutter_bloc: ^9.1.1
   dio: ^5.3.3

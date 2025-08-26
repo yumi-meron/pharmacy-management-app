@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_state.dart';
+import 'package:pharmacist_mobile/presentation/blocs/medicine/medicine_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/order_detail/order_detail_bloc.dart';
 import 'package:pharmacist_mobile/presentation/blocs/orders/orders_bloc.dart';
 import 'package:pharmacist_mobile/presentation/pages/home_page.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => getIt<AuthBloc>()..add(AuthCheckRequested())),
         BlocProvider(create: (_) => getIt<OrdersBloc>()),
         BlocProvider(create: (_) => getIt<OrderDetailBloc>()),
+        BlocProvider(create: (_) => getIt<MedicineBloc>()),
       ],
       child: MaterialApp(
         title: 'Pharmacy App',
@@ -50,7 +52,7 @@ class MyApp extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF01C587),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
               textStyle: const TextStyle(fontWeight: FontWeight.bold),

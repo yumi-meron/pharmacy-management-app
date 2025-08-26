@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pharmacist_mobile/domain/usecases/user/update_profile_usecase.dart';
-import 'package:pharmacist_mobile/presentation/blocs/User/user_event.dart';
-import 'package:pharmacist_mobile/presentation/blocs/User/user_state.dart';
+import 'package:pharmacist_mobile/presentation/blocs/user/user_event.dart';
+import 'package:pharmacist_mobile/presentation/blocs/user/user_state.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final UpdateProfile updateProfileUseCase;

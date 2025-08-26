@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dartz/dartz.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/error/failure.dart';
 import '../models/order_model.dart';
@@ -18,21 +18,21 @@ abstract class OrdersRemoteDataSource {
 
 class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
   late final http.Client _client;
-  final SharedPreferences _prefs;
+  final FlutterSecureStorage  _storage;
 
   OrdersRemoteDataSourceImpl({
     http.Client? client,
-    required SharedPreferences prefs,
-  }) : _prefs = prefs {
+    required FlutterSecureStorage storage,
+  }) : _storage = storage {
     _client = client ?? http.Client();
   }
 
   Future<Map<String, String>> _getHeaders() async {
-    final token = _prefs.getString('token');
-    final userJson = _prefs.getString('user');
+    final token = await _storage.read(key: "token");
+    final userJson = await _storage.read(key: 'user')?? '';
 
     if (token == null) throw Exception('No token found');
-    if (userJson == null) throw Exception('No user data found');
+    if (userJson == '') throw Exception('No user data found');
 
     final userMap = jsonDecode(userJson);
     final user = UserModel.fromJson(userMap);

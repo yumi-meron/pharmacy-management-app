@@ -9,154 +9,162 @@ import 'package:pharmacist_mobile/presentation/blocs/auth/auth_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/auth/auth_state.dart';
 import 'package:pharmacist_mobile/presentation/blocs/employee/employee_event.dart';
 import 'package:pharmacist_mobile/presentation/blocs/employee/employee_state.dart';
+import 'package:pharmacist_mobile/presentation/blocs/user/user_bloc.dart';
+import 'package:pharmacist_mobile/presentation/blocs/user/user_event.dart';
+import 'package:pharmacist_mobile/presentation/blocs/user/user_state.dart';
 import 'package:pharmacist_mobile/presentation/pages/sign_in_page.dart';
 import 'package:pharmacist_mobile/presentation/blocs/employee/employee_bloc.dart';
+
+// ✅ Assume you already have ProfileBloc/UpdateProfileEvent/ProfileState in your project
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<EmployeeBloc>()..add(FetchEmployees()),
-      child: MultiBlocListener(
-        listeners: [
-          BlocListener<AuthBloc, AuthState>(
-            listener: (context, state) {
-              if (state is AuthUnauthenticated) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const SignInPage(),
-                  ),
-                );
-              }
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthUnauthenticated) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SignInPage(),
+                ),
+              );
+            }
+          },
+        ),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: const Text(
+            "Settings",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
             },
           ),
-          BlocListener<EmployeeBloc, EmployeeState>(
-            listener: (context, state) {
-              if (state is EmployeeAddedSuccessfully) {
-                showModalBottomSheet(
+          backgroundColor: Colors.white,
+          actions: [
+            TextButton(
+              onPressed: () async {
+                final confirmed = await showDialog<bool>(
                   context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.white,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(24)),
-                  ),
-                  builder: (context) {
-                    final height = MediaQuery.of(context).size.height;
-                    return Container(
-                      height: height * 0.3,
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(24),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.verified, color: Colors.teal, size: 70),
-                          SizedBox(height: 24),
-                          Text(
-                            "User Created Successfully",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                  builder: (ctx) => AlertDialog(
+                    title: const Text("Logout"),
+                    content: const Text("Are you sure you want to logout?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(false),
+                        child: const Text("Cancel"),
                       ),
-                    );
-                  },
-                );
-
-                // Refresh employee list
-                context.read<EmployeeBloc>().add(FetchEmployees());
-              }
-
-              if (state is EmployeeError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: Colors.red[400],
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(true),
+                        child: const Text("Logout",
+                            style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
                   ),
                 );
-              }
-            },
-          ),
-        ],
-        child: Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: const Text(
-              "Settings",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.of(context).pop();
+
+                if (confirmed == true) {
+                  context.read<AuthBloc>().add(AuthLoggedOut());
+                }
               },
-            ),
-            backgroundColor: Colors.white,
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  final confirmed = await showDialog<bool>(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: const Text("Logout"),
-                      content: const Text("Are you sure you want to logout?"),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(false),
-                          child: const Text("Cancel"),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(true),
-                          child: const Text("Logout",
-                              style: TextStyle(color: Colors.red)),
-                        ),
-                      ],
-                    ),
-                  );
-
-                  if (confirmed == true) {
-                    context.read<AuthBloc>().add(AuthLoggedOut());
-                  }
-                },
-                child: const Text(
-                  "Logout",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
+              child: const Text(
+                "Logout",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          ),
-          body: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              if (state is AuthAuthenticated) {
-                final user = state.user;
+            ),
+          ],
+        ),
+        body: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            if (state is AuthAuthenticated) {
+              final user = state.user;
 
-                if (user.role == 'owner' || user.role == 'admin') {
-                  return _buildAdminSettings(context, user);
-                } else if (user.role == 'pharmacist') {
-                  return _buildPharmacistSettings(context, user);
-                } else {
-                  return const Center(child: Text('Unknown role'));
-                }
+              if (user.role == 'owner' || user.role == 'admin') {
+                // ✅ EmployeeBloc only for admin/owner
+                return BlocProvider(
+                  create: (context) =>
+                      getIt<EmployeeBloc>()..add(FetchEmployees()),
+                  child: BlocListener<EmployeeBloc, EmployeeState>(
+                    listener: (context, state) {
+                      if (state is EmployeeAddedSuccessfully) {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(24)),
+                          ),
+                          builder: (context) {
+                            final height = MediaQuery.of(context).size.height;
+                            return Container(
+                              height: height * 0.3,
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(24),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.verified,
+                                      color: Colors.teal, size: 70),
+                                  SizedBox(height: 24),
+                                  Text(
+                                    "User Created Successfully",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+
+                        context.read<EmployeeBloc>().add(FetchEmployees());
+                      }
+
+                      if (state is EmployeeError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.message),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.red[400],
+                          ),
+                        );
+                      }
+                    },
+                    child: _buildAdminSettings(context, user),
+                  ),
+                );
+              } else if (user.role == 'pharmacist') {
+                return _buildPharmacistSettings(context, user);
               } else {
-                return const Center(child: Text('Not authenticated'));
+                return const Center(child: Text('Unknown role'));
               }
-            },
-          ),
+            } else {
+              return const Center(child: Text('Not authenticated'));
+            }
+          },
         ),
       ),
     );
   }
 
+  // --- Build user card ---
   Widget _buildUserCard(BuildContext context, User user,
       {VoidCallback? onEdit}) {
     return Stack(
@@ -243,9 +251,10 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
+  // --- Admin settings (with employees list) ---
   Widget _buildAdminSettings(BuildContext context, User user) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 70), // ~ height of navigation bar
+      padding: const EdgeInsets.only(bottom: 70),
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -288,108 +297,30 @@ class SettingsPage extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        TextField(
-                          decoration: InputDecoration(
-                            hintText: "Search...",
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Color.fromARGB(255, 208, 208, 208)),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          onChanged: (value) {
-                            // TODO: handle search
-                          },
-                        ),
-                        const SizedBox(height: 10),
                         ...employees.map(
                           (employee) => ListTile(
-                              leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: Image.network(
-                                  employee.picture,
-                                  width: 40,
-                                  height: 40,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: 40,
-                                      height: 40,
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.person,
-                                          size: 24, color: Colors.white),
-                                    );
-                                  },
-                                ),
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Image.network(
+                                employee.picture,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 40,
+                                    height: 40,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.person,
+                                        size: 24, color: Colors.white),
+                                  );
+                                },
                               ),
-                              title: Text(employee.name),
-                              subtitle: Text(employee.role),
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return Dialog(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(24),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(24),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 35,
-                                              backgroundImage: NetworkImage(
-                                                  employee.picture),
-                                            ),
-                                            const SizedBox(height: 12),
-                                            Text(
-                                              employee.name,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              employee.phoneNumber,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black45),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              employee.role,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black45),
-                                            ),
-                                            const SizedBox(height: 16),
-                                            ElevatedButton(
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.teal,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(16),
-                                                ),
-                                              ),
-                                              child: const Text(
-                                                "Close",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              }),
-                        )
+                            ),
+                            title: Text(employee.name),
+                            subtitle: Text(employee.role),
+                          ),
+                        ),
                       ],
                     );
                   }
@@ -402,6 +333,9 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
+
+
+ 
 
   Widget _buildPharmacistSettings(BuildContext context, User user) {
     return ListView(
@@ -419,7 +353,6 @@ class SettingsPage extends StatelessWidget {
 }
 
 // --- Edit Profile Sheet ---
-
 void _showEditProfileSheet(BuildContext rootContext, User user) {
   final nameController = TextEditingController(text: user.name);
   final phoneController = TextEditingController(text: user.phoneNumber);
@@ -540,8 +473,7 @@ void _showEditProfileSheet(BuildContext rootContext, User user) {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                        height: 100), // Extra padding to avoid button overlap
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -552,9 +484,7 @@ void _showEditProfileSheet(BuildContext rootContext, User user) {
                 bottom: bottomPadding,
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
+                  color: Colors.white,
                   child: Row(
                     children: [
                       Expanded(
@@ -569,43 +499,77 @@ void _showEditProfileSheet(BuildContext rootContext, User user) {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            final updatedUser = user.copyWith(
-                              name: nameController.text.trim(),
-                              phoneNumber: phoneController.text.trim(),
-                              picture: pictureFile?.path ?? user.picture,
-                            );
-                            // Dispatch event to update user
-                            // rootContext
-                            //     .read<AuthBloc>()
-                            //     .add(UpdateProfile(user: updatedUser));
-                            Navigator.pop(context);
+                     Expanded(
+                      child: BlocProvider(
+                        create: (_) => getIt<ProfileBloc>(),
+                        child: BlocConsumer<ProfileBloc, ProfileState>(
+                          listener: (context, state) {
+                            if (state is ProfileUpdated) {
+                              Navigator.pop(context); // ✅ Close sheet/page on success
+                            } else if (state is ProfileUpdateError) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(state.message)), // show error
+                              );
+                            }
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          child: const Text(
-                            "Save",
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          builder: (context, state) {
+                            final isLoading = state is ProfileUpdating;
+                        
+                            return ElevatedButton(
+                              onPressed: isLoading
+                                  ? null
+                                  : () {
+                                      final updatedUser = user.copyWith(
+                                        name: nameController.text.trim(),
+                                        phoneNumber: phoneController.text.trim(),
+                                        picture: pictureFile != null
+                                            ? pictureFile!.path
+                                            : user.picture,
+                                      );
+                        
+                                      context.read<ProfileBloc>().add(
+                                            UpdateProfileEvent(
+                                              user: updatedUser,
+                                              pictureFile: pictureFile,
+                                            ),
+                                          );
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.teal,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                              ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    )
+                                  : const Text(
+                                      "Save",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                            );
+                          },
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      });
-    },
-  );
-}
+                    ),
+
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          });
+                        },
+                      );
+                    }
 
 // --- Add Employee Sheet ---
 void _showAddEmployeeSheet(BuildContext rootContext) {

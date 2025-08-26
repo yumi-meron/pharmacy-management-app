@@ -24,26 +24,24 @@ class UpdateMedicineModel extends UpdateMedicine {
       barcode: json['barcode'],
       unit: json['unit'],
       brand: json['brand'],
-      price: (json['price'] as num).toDouble(),
-      quantityAvailable: json['quantityAvailable'],
-      imageUrl: json['imageUrl'],
-      expiryDate: json['expiryDate'],
+      price: (json['price_per_unit'] as num).toDouble(),
+      quantityAvailable: json['stock'],
+      imageUrl: json['picture'],
+      expiryDate: json['expiry_date'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'variantid': variantid,
       'name': name,
       'description': description,
       'barcode': barcode,
       'unit': unit,
       'brand': brand,
-      'price': price,
-      'quantityAvailable': quantityAvailable,
-      'imageUrl': imageUrl,
-      'expiryDate': expiryDate,
+      'price_per_unit': price,
+      'stock': quantityAvailable,
+      'picture': imageUrl,
+      'expiry_date': expiryDate,
     };
   }
 }

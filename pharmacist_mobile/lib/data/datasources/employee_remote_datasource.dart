@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dartz/dartz.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:pharmacist_mobile/core/constants/api_constants.dart';
 import 'package:pharmacist_mobile/core/error/failure.dart';
 import 'package:pharmacist_mobile/data/models/user_model.dart';
 import 'package:pharmacist_mobile/domain/entities/user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class EmployeeDataSource {
   Future<Either<Failure, List<User>>> fetchEmployees();
@@ -20,22 +20,22 @@ abstract class EmployeeDataSource {
 
 class EmployeeDataSourceImpl implements EmployeeDataSource {
   late final http.Client _httpClient;
-  final SharedPreferences _prefs;
+  final FlutterSecureStorage _storage;
 
   EmployeeDataSourceImpl({
     http.Client? client,
-    required SharedPreferences prefs,
-  }) : _prefs = prefs {
+    required FlutterSecureStorage storage,
+  }) : _storage = storage {
     _httpClient = client ?? http.Client();
   }
 
   Future<Map<String, String>> _getHeaders() async {
-    final token = _prefs.getString('token');
-    final userJson = _prefs.getString('user');
+    final token = await _storage.read(key: "token");
+    final userJson = await _storage.read(key: 'user')?? '';
 
     if (token == null) throw Exception('No token found');
 
-    if (userJson == null) throw Exception('No user data found');
+    if (userJson == '') throw Exception('No user data found');
     final userMap = jsonDecode(userJson);
     final user = UserModel.fromJson(userMap);
     return {

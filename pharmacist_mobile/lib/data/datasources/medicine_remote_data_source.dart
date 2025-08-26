@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 
 import 'package:pharmacist_mobile/core/constants/api_constants.dart';
@@ -19,27 +19,29 @@ abstract class MedicineRemoteDataSource {
   Future<Either<Failure, List<Medicine>>> searchMedicines(String query);
   Future<Either<Failure, Medicine>> getMedicineDetails(String id);
   Future<UpdateMedicineModel> updateMedicine(UpdateMedicineModel medicine);
+  Future<MedicineModel> getMedicineByBarcode(String barcode);
+
 }
 
 /// 🔹 Implementation
 class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
   late final http.Client _httpClient;
-  final SharedPreferences _prefs;
+  final FlutterSecureStorage _storage;
 
   MedicineRemoteDataSourceImpl({
     http.Client? client,
-    required SharedPreferences prefs,
-  }) : _prefs = prefs {
+    required FlutterSecureStorage storage,
+  }) : _storage = storage {
     _httpClient = client ?? http.Client();
   }
 
   /// 🔹 Private helper for headers
   Future<Map<String, String>> _getHeaders() async {
-    final token = _prefs.getString('token');
-    final userJson = _prefs.getString('user');
+    final token = await _storage.read(key: "token");
+    final userJson = await _storage.read(key: 'user')?? '';
 
     if (token == null) throw Exception('No token found');
-    if (userJson == null) throw Exception('No user data found');
+    if (userJson == '') throw Exception('No user data found');
 
     final userMap = jsonDecode(userJson);
     final user = UserModel.fromJson(userMap);
@@ -75,6 +77,21 @@ class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
       return const Left(ConnectionFailure('Failed to connect to the network'));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<MedicineModel> getMedicineByBarcode(String barcode) async {
+    final uri = Uri.parse("${ApiConstants.baseUrl}/api/medicines/barcode/$barcode");
+    final headers = await _getHeaders();
+
+    final response = await _httpClient.get(uri, headers: headers);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return MedicineModel.fromJson(data);
+    } else {
+      throw Exception("Failed to fetch medicine: ${response.body}");
     }
   }
 
