@@ -167,6 +167,7 @@ class SettingsPage extends StatelessWidget {
   // --- Build user card ---
   Widget _buildUserCard(BuildContext context, User user,
       {VoidCallback? onEdit}) {
+        
     return Stack(
       children: [
         Container(
@@ -499,77 +500,89 @@ void _showEditProfileSheet(BuildContext rootContext, User user) {
                         ),
                       ),
                       const SizedBox(width: 12),
-                     Expanded(
-                      child: BlocProvider(
-                        create: (_) => getIt<ProfileBloc>(),
-                        child: BlocConsumer<ProfileBloc, ProfileState>(
-                          listener: (context, state) {
-                            if (state is ProfileUpdated) {
-                              Navigator.pop(context); // ✅ Close sheet/page on success
-                            } else if (state is ProfileUpdateError) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(state.message)), // show error
-                              );
-                            }
-                          },
-                          builder: (context, state) {
-                            final isLoading = state is ProfileUpdating;
-                        
-                            return ElevatedButton(
-                              onPressed: isLoading
-                                  ? null
-                                  : () {
-                                      final updatedUser = user.copyWith(
-                                        name: nameController.text.trim(),
-                                        phoneNumber: phoneController.text.trim(),
-                                        picture: pictureFile != null
-                                            ? pictureFile!.path
-                                            : user.picture,
-                                      );
-                        
-                                      context.read<ProfileBloc>().add(
-                                            UpdateProfileEvent(
-                                              user: updatedUser,
-                                              pictureFile: pictureFile,
-                                            ),
-                                          );
-                                    },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.teal,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
+                      Expanded(
+                        child: BlocProvider(
+                          create: (_) => getIt<ProfileBloc>(),
+                          child: BlocConsumer<ProfileBloc, ProfileState>(
+                            listener: (context, state) {
+                              if (state is ProfileUpdated) {
+                                rootContext.read<AuthBloc>().add(UpdateAuthenticatedUser(state.user));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Profile updated successfully"),
+                                    behavior: SnackBarBehavior.floating,
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+
+                                
+
+
+                                Navigator.pop(context); // ✅ Close sheet/page on success
+                              } else if (state is ProfileUpdateError) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(state.message)), // show error
+                                );
+                              }
+                            },
+                            builder: (context, state) {
+                              final isLoading = state is ProfileUpdating;
+                          
+                              return ElevatedButton(
+                                onPressed: isLoading
+                                    ? null
+                                    : () {
+                                        final updatedUser = user.copyWith(
+                                          name: nameController.text.trim(),
+                                          phoneNumber: phoneController.text.trim(),
+                                          picture: pictureFile != null
+                                              ? pictureFile!.path
+                                              : user.picture,
+                                        );
+                          
+                                        context.read<ProfileBloc>().add(
+                                              UpdateProfileEvent(
+                                                user: updatedUser,
+                                                pictureFile: pictureFile,
+                                              ),
+                                            );
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.teal,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
                                 ),
-                              ),
-                              child: isLoading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                child: isLoading
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      )
+                                    : const Text(
+                                        "Save",
+                                        style: TextStyle(color: Colors.white),
                                       ),
-                                    )
-                                  : const Text(
-                                      "Save",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
-                    ),
 
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          });
-                        },
-                      );
-                    }
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      });
+    },
+  );
+}
 
 // --- Add Employee Sheet ---
 void _showAddEmployeeSheet(BuildContext rootContext) {

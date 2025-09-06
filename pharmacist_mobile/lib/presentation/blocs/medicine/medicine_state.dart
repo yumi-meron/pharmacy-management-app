@@ -25,7 +25,7 @@ class MedicineLoaded extends MedicineState {
 class MedicineUpdating extends MedicineState {}
 
 class MedicineUpdated extends MedicineState {
-  final UpdateMedicine medicine;
+  final Medicine medicine;
 
   const MedicineUpdated(this.medicine);
 

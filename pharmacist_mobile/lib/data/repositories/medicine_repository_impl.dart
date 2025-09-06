@@ -29,7 +29,7 @@ class MedicineRepositoryImpl implements MedicineRepository {
 
 
   @override
-  Future<Either<Failure, UpdateMedicine>> updateMedicine(
+  Future<Either<Failure, Medicine>> updateMedicine(
       UpdateMedicine medicine) async {
     try {
       final model = UpdateMedicineModel(
@@ -47,9 +47,9 @@ class MedicineRepositoryImpl implements MedicineRepository {
       );
 
       final result = await dataSource.updateMedicine(model);
-      print(result);
+      // print(result);
 
-      return Right(result);
+      return Right(result.toEntity());
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

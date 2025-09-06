@@ -18,7 +18,7 @@ class User extends Equatable {
   });
 
   @override
-  List<Object> get props => [id, name, phoneNumber, role, pharmacyId];
+  List<Object> get props => [id, name, phoneNumber, role, pharmacyId, picture];
 
   /// Create a modified copy while keeping other fields the same.
   User copyWith({
