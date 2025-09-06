@@ -31,32 +31,36 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   @override
   Future<User> updateProfile(User user, File? pictureFile) async {
     final headers = await _getHeaders();
-    final uri = Uri.parse('${ApiConstants.baseUrl}/api/me');
-
+    final uri = Uri.parse('${ApiConstants.baseUrl}/api/users/me');
+    print('update profile before request: ${user.toString()}');
     final request = http.MultipartRequest("PUT", uri);
     request.headers.addAll(headers);
 
     // add fields
-    request.fields['name'] = user.name;
-    request.fields['phoneNumber'] = user.phoneNumber;
+    request.fields['full_name'] = user.name;
+    request.fields['phone_number'] = user.phoneNumber;
 
     // attach image if new picture selected
     if (pictureFile != null && pictureFile.existsSync()) {
       request.files.add(
         await http.MultipartFile.fromPath(
-          'picture',
+          'profile_picture',
           pictureFile.path,
           contentType: MediaType('image', 'jpeg'),
         ),
       );
     }
-
     final streamedResponse = await _client.send(request);
     final response = await http.Response.fromStream(streamedResponse);
+    print('response of update profile : ${response.body}');
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return UserModel.fromJson(data).toEntity();
+      final user = UserModel.fromJson(data).toEntity();
+      // update user in secure storage
+      await _storage.write(key: "user", value: jsonEncode(data));
+
+      return user;
     } else {
       throw Exception("Failed to update profile: ${response.body}");
     }

@@ -18,9 +18,8 @@ abstract class MedicineRemoteDataSource {
   Future<Either<Failure, List<Medicine>>> getAllMedicines();
   Future<Either<Failure, List<Medicine>>> searchMedicines(String query);
   Future<Either<Failure, Medicine>> getMedicineDetails(String id);
-  Future<UpdateMedicineModel> updateMedicine(UpdateMedicineModel medicine);
+  Future<MedicineModel> updateMedicine(UpdateMedicineModel medicine);
   Future<MedicineModel> getMedicineByBarcode(String barcode);
-
 }
 
 /// 🔹 Implementation
@@ -38,7 +37,7 @@ class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
   /// 🔹 Private helper for headers
   Future<Map<String, String>> _getHeaders() async {
     final token = await _storage.read(key: "token");
-    final userJson = await _storage.read(key: 'user')?? '';
+    final userJson = await _storage.read(key: 'user') ?? '';
 
     if (token == null) throw Exception('No token found');
     if (userJson == '') throw Exception('No user data found');
@@ -82,7 +81,8 @@ class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
 
   @override
   Future<MedicineModel> getMedicineByBarcode(String barcode) async {
-    final uri = Uri.parse("${ApiConstants.baseUrl}/api/medicines/barcode/$barcode");
+    final uri =
+        Uri.parse("${ApiConstants.baseUrl}/api/barcodes/$barcode");
     final headers = await _getHeaders();
 
     final response = await _httpClient.get(uri, headers: headers);
@@ -97,51 +97,52 @@ class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
 
   /// 🔹 Update medicine
   @override
-  Future<UpdateMedicineModel> updateMedicine(UpdateMedicineModel medicine) async {
+  Future<MedicineModel> updateMedicine(
+      UpdateMedicineModel medicine) async {
     final headers = await _getHeaders();
     final uri = Uri.parse(
-    '${ApiConstants.baseUrl}/api/medicines/${medicine.id}/variants/${medicine.variantid}',
-  );
-
-  // Use MultipartRequest for file + fields
-  final request = http.MultipartRequest("PUT", uri);
-
-  // Add headers (excluding Content-Type, since Multipart will set it automatically)
-  request.headers.addAll(headers..remove('Content-Type'));
-
-  // Add text fields
-  request.fields['name'] = medicine.name;
-  request.fields['description'] = medicine.description;
-  request.fields['barcode'] = medicine.barcode;
-  request.fields['unit'] = medicine.unit;
-  request.fields['brand'] = medicine.brand;
-  request.fields['price'] = medicine.price.toString();
-  request.fields['quantityAvailable'] = medicine.quantityAvailable.toString();
-  request.fields['expiryDate'] = medicine.expiryDate;
-
-  // Handle image upload if provided
-  if (medicine.imageUrl.isNotEmpty && File(medicine.imageUrl).existsSync()) {
-    final file = File(medicine.imageUrl);
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        'image', // 🔹 field name expected by API
-        file.path,
-        contentType: MediaType('image', 'jpeg'), // or png if needed
-      ),
+      '${ApiConstants.baseUrl}/api/medicines/${medicine.id}/variants/${medicine.variantid}',
     );
-  }
 
-  // Send request
-  final streamedResponse = await _httpClient.send(request);
-  final response = await http.Response.fromStream(streamedResponse);
+    // Use MultipartRequest for file + fields
+    final request = http.MultipartRequest("PUT", uri);
 
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    return UpdateMedicineModel.fromJson(data);
-  } else {
-    throw Exception("Failed to update medicine: ${response.body}");
+    // Add headers (excluding Content-Type, since Multipart will set it automatically)
+    request.headers.addAll(headers..remove('Content-Type'));
+
+    // Add text fields
+    request.fields['name'] = medicine.name;
+    request.fields['description'] = medicine.description;
+    request.fields['barcode'] = medicine.barcode;
+    request.fields['unit'] = medicine.unit;
+    request.fields['brand'] = medicine.brand;
+    request.fields['price_per_unit'] = medicine.price.toString();
+    request.fields['stock'] = medicine.quantityAvailable.toString();
+    request.fields['expiry_date'] = medicine.expiryDate;
+
+    // Handle image upload if provided
+    if (medicine.imageUrl.isNotEmpty && File(medicine.imageUrl).existsSync()) {
+      final file = File(medicine.imageUrl);
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'picture', // 🔹 field name expected by API
+          file.path,
+          contentType: MediaType('image', 'jpeg'), // or png if needed
+        ),
+      );
+    }
+
+    // Send request
+    final streamedResponse = await _httpClient.send(request);
+    final response = await http.Response.fromStream(streamedResponse);
+    // print('Response from update medicine: ${response.statusCode}');
+    if (response.statusCode == 200) {
+      return MedicineModel.fromJson(jsonDecode(response.body));
+    } else {
+      // print('responseeeeeeeeeee ${response.body}');
+      throw Exception("Failed to update medicine: ${response.body}");
+    }
   }
-}
 
   /// 🔹 Search medicines
   @override

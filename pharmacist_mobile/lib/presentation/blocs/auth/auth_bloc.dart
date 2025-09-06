@@ -21,6 +21,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ForgotPasswordEvent>(_onForgotPassword);
     on<AuthLoggedOut>(_onLoggedOut);
     on<AuthCheckRequested>(_onAuthCheckRequested);
+    on<UpdateAuthenticatedUser>((event, emit) {
+    final currentState = state;
+    if (currentState is AuthAuthenticated) {
+      // Emit new state with updated user
+      emit(AuthAuthenticated(event.user));
+    }
+  });
   }
   Future<void> _onAuthCheckRequested(
     AuthCheckRequested event,
@@ -42,7 +49,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthUnauthenticated());
     }
   }
-
+  
 
 
   Future<void> _onSignIn(SignInEvent event, Emitter<AuthState> emit) async {

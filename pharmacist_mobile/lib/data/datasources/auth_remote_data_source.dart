@@ -72,6 +72,8 @@ class RemoteDataSourceImpl extends AuthRemoteDataSource {
       return Left(ServerFailure('Unexpected error: ${e.toString()}'));
     }
   }
+  //get user implementation
+  
 
   String _getErrorMessage(DioException e) {
     if (e.response != null &&

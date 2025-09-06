@@ -15,15 +15,14 @@ import 'package:pharmacist_mobile/presentation/pages/edit_medicine_page.dart';
 
 class MedicineDetailPage extends StatefulWidget {
   final String? medicineId;
-    final Medicine? medicine; // Pass this if coming from scanner
-
+  final Medicine? medicine; // Pass this if coming from scanner
 
   const MedicineDetailPage({
     super.key,
     this.medicineId,
     this.medicine,
-  }) : assert(medicineId != null || medicine != null, 
-        "Either medicineId or medicine must be provided");
+  }) : assert(medicineId != null || medicine != null,
+            "Either medicineId or medicine must be provided");
 
   @override
   _MedicineDetailPageState createState() => _MedicineDetailPageState();
@@ -34,34 +33,27 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
   int quantity = 1; // State variable to track the quantity
 
   @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<MedicineBloc>();
+    if (widget.medicine != null) {
+      bloc.add(AlreadyFetchedMedicineEvent(widget.medicine!));
+    } else if (widget.medicineId != null) {
+      bloc.add(GetMedicineDetailsEvent(widget.medicineId!));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<MedicineBloc>(
-          create: (context) {
-            final bloc = getIt<MedicineBloc>();
-            if (widget.medicine != null) {
-              // Inject state directly (no API call)
-              bloc.add(AlreadyFetchedMedicineEvent(widget.medicine!));
-            } else if (widget.medicineId != null) {
-              // Fetch from backend
-              bloc.add(GetMedicineDetailsEvent(widget.medicineId!));
-            }
-            return bloc;
-          },
-        ),
-        BlocProvider<CartBloc>(
-          create: (_) =>
-              getIt<CartBloc>(), // Or manually: CartBloc(cartRepository: ...)
-        ),
-      ],
+    return BlocProvider<CartBloc>(
+      create: (_) => getIt<CartBloc>(),
       child: Scaffold(
         body: BlocBuilder<MedicineBloc, MedicineState>(
           builder: (context, state) {
             if (state is MedicineLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is MedicineDetailsLoaded) {
-              final medicine = state.medicine;
+              var medicine = state.medicine;
 
               // Initialize the selected variant if not already set
               selectedVariant ??= medicine.variants.first;
@@ -132,8 +124,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                     ),
                                     child: DropdownButton<String>(
                                       value: selectedVariant?.unit,
-                                      underline:
-                                          const SizedBox(), // Remove default underline
+                                      underline: const SizedBox(),
                                       items: medicine.variants
                                           .map(
                                             (variant) =>
@@ -307,22 +298,24 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                 child: const Icon(Icons.more_vert,
                                     size: 20, color: Colors.white),
                               ),
-                              onSelected: (value) {
+                              onSelected: (value) async {
                                 if (value == "edit") {
-                                  Navigator.push(
+                                  final updatedMedicineId =
+                                      await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => BlocProvider(
-                                        create: (_) => getIt<MedicineBloc>()
-                                          ..add(GetMedicineDetailsEvent(
-                                              id)),
-                                        child: EditMedicinePage(
-                                            medicineId: id),
+                                      builder: (context) => EditMedicinePage(
+                                        medicineId: id,
                                       ),
                                     ),
                                   );
+
+                                  if (updatedMedicineId != null) {
+                                    context.read<MedicineBloc>().add(
+                                        GetMedicineDetailsEvent(
+                                            updatedMedicineId));
+                                  }
                                 } else if (value == "delete") {
-                                  // handle delete
                                   Navigator.pop(context);
                                 }
                               },
@@ -339,8 +332,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                             );
                           }
                         }
-                        return const SizedBox
-                            .shrink(); // no menu for other roles
+                        return const SizedBox.shrink();
                       },
                     ),
                   ),
@@ -390,44 +382,43 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 height: 40,
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100], // Background color
-                  borderRadius: BorderRadius.circular(50), // Border radius
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(50),
                 ),
                 child: Row(
                   children: [
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          if (quantity > 1)
-                            quantity--; // Decrement but not below 1
+                          if (quantity > 1) quantity--;
                         });
                       },
                       icon: const Icon(Icons.remove_circle_outline),
-                      color: const Color(0xFF01C587), // Updated color
+                      color: const Color(0xFF01C587),
                     ),
-                    const SizedBox(width: 5), // Added space
+                    const SizedBox(width: 5),
                     Text("$quantity", style: const TextStyle(fontSize: 18)),
-                    const SizedBox(width: 5), // Added space
+                    const SizedBox(width: 5),
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          quantity++; // Increment
+                          quantity++;
                         });
                       },
                       icon: const Icon(Icons.add_circle_outline),
-                      color: const Color(0xFF01C587), // Updated color
+                      color: const Color(0xFF01C587),
                     ),
                   ],
                 ),
               ),
-              const Spacer(), // Spacer to grow with screen width
+              const Spacer(),
               // Add to Cart Button
               SizedBox(
                 width: 200,
-                height: 45, // Fixed width of 50
+                height: 45,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF01C587), // Updated color
+                    backgroundColor: const Color(0xFF01C587),
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
@@ -450,7 +441,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                   child: const Text(
                     "Add to Cart",
                     style: TextStyle(
-                      fontSize: 12, // Adjusted font size for smaller button
+                      fontSize: 12,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -472,7 +463,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           Text(
             title,
             style: const TextStyle(
-              fontWeight: FontWeight.bold, // Bold for the title
+              fontWeight: FontWeight.bold,
               fontSize: 12,
               color: Colors.black,
             ),
@@ -481,7 +472,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           Text(
             value,
             style: const TextStyle(
-              fontWeight: FontWeight.normal, // Thin for the content
+              fontWeight: FontWeight.normal,
               fontSize: 12,
               color: Colors.black87,
             ),

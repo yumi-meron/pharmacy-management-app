@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:pharmacist_mobile/domain/entities/user.dart';
 
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
@@ -19,6 +20,10 @@ class SignInEvent extends AuthEvent {
 class SignedIn extends AuthEvent {
   final String token;
   const SignedIn(this.token);
+}
+class UpdateAuthenticatedUser extends AuthEvent {
+  final User user;
+  UpdateAuthenticatedUser(this.user);
 }
 class AuthCheckRequested extends AuthEvent {}
 

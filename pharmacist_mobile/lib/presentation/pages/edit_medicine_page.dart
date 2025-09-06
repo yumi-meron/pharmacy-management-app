@@ -30,6 +30,13 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
 
   File? _pickedImage;
 
+  @override
+  void initState() {
+    super.initState();
+    // 🔹 Trigger fetching medicine details using global MedicineBloc
+    context.read<MedicineBloc>().add(GetMedicineDetailsEvent(widget.medicineId));
+  }
+
   Future<void> _pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -43,19 +50,36 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<MedicineBloc, MedicineState>(
-        builder: (context, state) {
-          if (state is MedicineLoading) {
-            return const Center(child: CircularProgressIndicator());
+      body: BlocConsumer<MedicineBloc, MedicineState>(
+        listener: (context, state) {
+          if (state is MedicineUpdated) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Medicine updated successfully"),
+                backgroundColor: Colors.green,
+              ),
+            );
+
+            // Refresh details and return id
+            context
+                .read<MedicineBloc>()
+                .add(GetMedicineDetailsEvent(state.medicine.id));
+            Navigator.pop(context, state.medicine.id);
+          } else if (state is MedicineUpdateError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Error: ${state.message}"),
+                backgroundColor: Colors.red,
+              ),
+            );
           }
-          if (state is MedicineUpdating) {
+        },
+        builder: (context, state) {
+          if (state is MedicineLoading || state is MedicineUpdating) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is MedicineDetailsLoaded) {
             final medicine = state.medicine;
-            final selectedVariant = medicine.variants.firstWhere(
-              (variant) => variant.id == widget.medicineId,
-              orElse: () => medicine.variants.first,
-            );
+            final selectedVariant = medicine.variants.first;
 
             // Prefill controllers only once
             if (_stockController.text.isEmpty) {
@@ -66,8 +90,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
               _priceController.text = selectedVariant.pricePerUnit.toString();
             }
             if (_expireDateController.text.isEmpty) {
-              final expiryDate =
-                  DateTime.parse(selectedVariant.expiryDate.toString());
+              final expiryDate = selectedVariant.expiryDate;
               _expireDateController.text =
                   "${expiryDate.year}-${expiryDate.month.toString().padLeft(2, '0')}-${expiryDate.day.toString().padLeft(2, '0')}";
             }
@@ -83,7 +106,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
 
             return SafeArea(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 120), // space for buttons
+                padding: const EdgeInsets.only(bottom: 120),
                 child: Column(
                   children: [
                     // Image Section
@@ -209,8 +232,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
               ),
             );
           } else if (state is MedicineError) {
-            return Center(
-                child: Text("Error: ${(state as MedicineError).message}"));
+            return Center(child: Text("Error: ${state.message}"));
           }
           return const SizedBox();
         },
@@ -221,8 +243,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color:
-                  const Color.fromARGB(255, 220, 220, 220).withOpacity(0.2),
+              color: const Color.fromARGB(255, 220, 220, 220).withOpacity(0.2),
               spreadRadius: 2,
               blurRadius: 5,
               offset: const Offset(0, -3),
@@ -259,13 +280,10 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  final state =
-                      context.read<MedicineBloc>().state as MedicineDetailsLoaded;
+                  final state = context.read<MedicineBloc>().state
+                      as MedicineDetailsLoaded;
                   final medicine = state.medicine;
-                  final selectedVariant = medicine.variants.firstWhere(
-                    (variant) => variant.id == widget.medicineId,
-                    orElse: () => medicine.variants.first,
-                  );
+                  final selectedVariant = medicine.variants.first;
 
                   UpdateMedicine newMedicine = UpdateMedicine(
                     id: widget.medicineId,
