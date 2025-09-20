@@ -84,6 +84,7 @@ class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
     final uri =
         Uri.parse("${ApiConstants.baseUrl}/api/barcodes/$barcode");
     final headers = await _getHeaders();
+    print('Fetching medicine with barcode: $barcode');
 
     final response = await _httpClient.get(uri, headers: headers);
 
