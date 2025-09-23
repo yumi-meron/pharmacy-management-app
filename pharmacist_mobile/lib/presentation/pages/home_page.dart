@@ -21,13 +21,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0; // Track the selected index
+  int _selectedIndex = 0;
+
+  // 🔹 Keep InventoryPage alive and accessible
+  final GlobalKey<InventoryPageState> _inventoryKey = GlobalKey<InventoryPageState>();
+  late InventoryPage _inventoryPage;
 
   @override
   void initState() {
     super.initState();
+    _inventoryPage = InventoryPage(key: _inventoryKey);
     // Fetch medicines when home page first loads
     context.read<MedicineBloc>().add(const FetchAllMedicines());
+  }
+
+  void _openCategory(String category) {
+    setState(() {
+      _selectedIndex = 1; // Switch to Inventory tab
+    });
+    _inventoryKey.currentState?.setCategory(category.toLowerCase());
   }
 
   @override
@@ -90,10 +102,9 @@ class _HomePageState extends State<HomePage> {
           SafeArea(
             child: BlocConsumer<MedicineBloc, MedicineState>(
               listenWhen: (previous, current) =>
-                  current is MedicineUpdated, // only listen on update
+                  current is MedicineUpdated,
               listener: (context, state) {
                 if (state is MedicineUpdated) {
-                  // After update, refresh the medicine list
                   context.read<MedicineBloc>().add(const FetchAllMedicines());
                 }
               },
@@ -160,9 +171,6 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                       ),
-                                      // onChanged: (query) => context
-                                      //     .read<MedicineBloc>()
-                                      //     .add(SearchMedicines(query)),
                                     ),
                                   ),
                                   const SizedBox(height: 20),
@@ -268,7 +276,9 @@ class _HomePageState extends State<HomePage> {
                                                       ),
                                                     ),
                                                   ),
-                                                  onPressed: () {},
+                                                  onPressed: () {
+                                                    _openCategory(cat);
+                                                  },
                                                   child: Text(
                                                     cat,
                                                     style: const TextStyle(
@@ -324,7 +334,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                    const InventoryPage(),
+                    _inventoryPage,
                     const OrdersListPage(),
                     const SettingsPage(),
                   ],

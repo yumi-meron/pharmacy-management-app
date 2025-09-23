@@ -5,6 +5,7 @@ class MedicineModel {
   final String id;
   final String name;
   final String? category;
+  final String? medicineUsage;
   final String? description;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -16,6 +17,7 @@ class MedicineModel {
     required this.id,
     required this.name,
     required this.category,
+    this.medicineUsage,
     this.description,
     required this.createdAt,
     required this.updatedAt,
@@ -29,6 +31,7 @@ class MedicineModel {
       id: json['id'],
       name: json['name'],
       category: json['category'],
+      medicineUsage: json['medical_usecase'],
       description: json['description'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
@@ -45,6 +48,7 @@ class MedicineModel {
         id: id,
         name: name,
         category: category ?? '',
+        medicineUsage: medicineUsage ?? '',
         description: description,
         createdAt: createdAt,
         updatedAt: updatedAt,

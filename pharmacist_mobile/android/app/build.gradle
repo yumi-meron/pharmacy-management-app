@@ -5,6 +5,7 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+
 android {
     namespace = "com.example.pharmacist_mobile"
     compileSdk = flutter.compileSdkVersion
@@ -29,6 +30,7 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+    
 
     buildTypes {
         release {

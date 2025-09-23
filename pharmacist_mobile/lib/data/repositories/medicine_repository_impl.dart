@@ -37,6 +37,7 @@ class MedicineRepositoryImpl implements MedicineRepository {
         variantid: medicine.variantid,
         name: medicine.name,
         description: medicine.description,
+        medicineUsage: medicine.medicineUsage,
         barcode: medicine.barcode,
         unit: medicine.unit,
         brand: medicine.brand,
@@ -56,13 +57,22 @@ class MedicineRepositoryImpl implements MedicineRepository {
   }
 
   @override
-  Future<Either<Failure, List<Medicine>>> searchMedicines(String query) async {
+  Future<Either<Failure, List<Medicine>>> searchMedicines({
+    required String query,
+    String? filter,
+    String? category,
+  }) async {
     if (await networkInfo.isConnected) {
-      return await dataSource.searchMedicines(query);
+      return await dataSource.searchMedicines(
+        query: query,
+        filter: filter,
+        category: category,
+      );
     } else {
       return const Left(ConnectionFailure('No internet connection'));
     }
   }
+
 
   @override
   Future<Either<Failure, Medicine>> getMedicineDetails(String id) async {
