@@ -8,7 +8,15 @@ class SearchMedicines {
 
   SearchMedicines(this.repository);
 
-  Future<Either<Failure, List<Medicine>>> call(String query) {
-    return repository.searchMedicines(query);
+  Future<Either<Failure, List<Medicine>>> call({
+    required String query,
+    String? filter,
+    String? category,
+  }) {
+    return repository.searchMedicines(
+      query: query,
+      filter: filter,
+      category: category,
+    );
   }
 }

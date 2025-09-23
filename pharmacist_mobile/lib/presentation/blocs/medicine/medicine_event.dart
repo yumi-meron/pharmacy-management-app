@@ -20,11 +20,13 @@ class ScanBarcodeEvent extends MedicineEvent {
 
 class SearchMedicines extends MedicineEvent {
   final String query;
+  final String? filter;   // name, description, brand
+  final String? category; // antibiotics, vitamins, pain relief, cold & flu
 
-  const SearchMedicines(this.query);
+  const SearchMedicines(this.query, {this.filter, this.category});
 
   @override
-  List<Object> get props => [query];
+  List<Object> get props => [query, filter ?? '', category ?? ''];
 }
 
 class UpdateMedicineEvent extends MedicineEvent {

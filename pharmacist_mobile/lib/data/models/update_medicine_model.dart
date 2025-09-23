@@ -6,6 +6,7 @@ class UpdateMedicineModel extends UpdateMedicine {
     required super.variantid,
     required super.name,
     required super.description,
+    required super.medicineUsage,
     required super.barcode,
     required super.unit,
     required super.brand,
@@ -21,6 +22,7 @@ class UpdateMedicineModel extends UpdateMedicine {
       variantid: json['variantid'],
       name: json['name'],
       description: json['description'],
+      medicineUsage: json['medical_usecase'],
       barcode: json['barcode'],
       unit: json['unit'],
       brand: json['brand'],
@@ -35,6 +37,7 @@ class UpdateMedicineModel extends UpdateMedicine {
     return {
       'name': name,
       'description': description,
+      'medical_usecase': medicineUsage,
       'barcode': barcode,
       'unit': unit,
       'brand': brand,

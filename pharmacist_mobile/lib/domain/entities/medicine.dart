@@ -5,6 +5,7 @@ class Medicine extends Equatable {
   final String id;
   final String name;
   final String category;
+  final String medicineUsage;
   final String? description;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -16,6 +17,7 @@ class Medicine extends Equatable {
     required this.id,
     required this.name,
     required this.category,
+    required this.medicineUsage,
     this.description,
     required this.createdAt,
     required this.updatedAt,

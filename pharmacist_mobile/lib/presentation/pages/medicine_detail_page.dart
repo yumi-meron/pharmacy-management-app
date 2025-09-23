@@ -241,12 +241,8 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                   children: [
                                     sectionTitle('Medical Usage:'),
                                     const SizedBox(height: 8),
-                                    sectionTextBullet([
-                                      'Relieves headaches, muscle aches, and menstrual cramps.',
-                                      'Reduces fever associated with infections or illnesses.',
-                                      'Suitable for short-term pain management in adults and children over 12.',
-                                      'Can be used as an adjunct in cold and flu symptom relief.',
-                                    ]),
+                                    
+                                   Text(medicine.medicineUsage),
                                   ],
                                 ),
                               ),

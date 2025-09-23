@@ -53,14 +53,21 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
   
 
   Future<void> _onSearchMedicines(
-      SearchMedicines event, Emitter<MedicineState> emit) async {
-    emit(MedicineLoading());
-    final result = await repository.searchMedicines(event.query);
-    result.fold(
-      (failure) => emit(MedicineError(_mapFailureToMessage(failure))),
-      (medicines) => emit(MedicineLoaded(medicines)),
-    );
-  }
+    SearchMedicines event, Emitter<MedicineState> emit) async {
+      emit(MedicineLoading());
+
+      final result = await repository.searchMedicines(
+        query: event.query,
+        filter: event.filter,
+        category: event.category,
+      );
+
+      result.fold(
+        (failure) => emit(MedicineError(_mapFailureToMessage(failure))),
+        (medicines) => emit(MedicineLoaded(medicines)),
+      );
+    }
+
 
   Future<void> _onFetchAllMedicines(
       FetchAllMedicines event, Emitter<MedicineState> emit) async {
