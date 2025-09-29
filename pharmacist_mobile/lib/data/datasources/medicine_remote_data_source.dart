@@ -16,7 +16,11 @@ import 'package:pharmacist_mobile/domain/entities/medicine.dart';
 /// 🔹 Abstract definition
 abstract class MedicineRemoteDataSource {
   Future<Either<Failure, List<Medicine>>> getAllMedicines();
-  Future<Either<Failure, List<Medicine>>> searchMedicines(String query);
+  Future<Either<Failure, List<Medicine>>> searchMedicines({
+    required String query,
+    String? filter,
+    String? category,
+  });
   Future<Either<Failure, Medicine>> getMedicineDetails(String id);
   Future<MedicineModel> updateMedicine(UpdateMedicineModel medicine);
   Future<MedicineModel> getMedicineByBarcode(String barcode);
@@ -84,7 +88,7 @@ class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
     final uri =
         Uri.parse("${ApiConstants.baseUrl}/api/barcodes/$barcode");
     final headers = await _getHeaders();
-    print('Fetching medicine with barcode: $barcode');
+    // print('Fetching medicine with barcode: $barcode');
 
     final response = await _httpClient.get(uri, headers: headers);
 
@@ -147,14 +151,26 @@ class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
 
   /// 🔹 Search medicines
   @override
-  Future<Either<Failure, List<Medicine>>> searchMedicines(String query) async {
+  Future<Either<Failure, List<Medicine>>> searchMedicines({
+    required String query,
+    String? filter,
+    String? category,
+  }) async {
     try {
       final headers = await _getHeaders();
-      final response = await _httpClient.get(
-        Uri.parse('${ApiConstants.baseUrl}/api/medicines/search?query=$query'),
-        headers: headers,
+      final response = await _httpClient.post(
+        Uri.parse('${ApiConstants.baseUrl}/api/medicines/search'),
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "query": query,
+          "filter": filter ?? "name",      // default to name if null
+          "catagory": category ?? "none",  // default to none if null
+        }),
       );
-
+      print('Search response status: ${response.statusCode}');
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         final result = data
@@ -162,7 +178,8 @@ class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
             .toList();
         return Right(result);
       } else {
-        return const Left(ServerFailure('Failed to search medicines'));
+        return Left(ServerFailure(
+            'Failed to search medicines: ${response.statusCode}'));
       }
     } on SocketException {
       return const Left(ConnectionFailure('Failed to connect to the network'));
@@ -170,6 +187,7 @@ class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
       return Left(ServerFailure(e.toString()));
     }
   }
+
 
   /// 🔹 Get medicine details
   @override
@@ -184,6 +202,7 @@ class MedicineRemoteDataSourceImpl implements MedicineRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final result = MedicineModel.fromJson(data).toEntity();
+        print('Medicine details fetched: ${data}');
         return Right(result);
       } else {
         return const Left(ServerFailure('Failed to load medicine details'));

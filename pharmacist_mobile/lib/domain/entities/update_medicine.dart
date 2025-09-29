@@ -5,6 +5,7 @@ class UpdateMedicine extends Equatable {
   final String variantid;
   final String name;
   final String description;
+  final String medicineUsage;
   final String barcode;
   final String unit;
   final String brand;
@@ -18,6 +19,7 @@ class UpdateMedicine extends Equatable {
     required this.variantid,
     required this.name,
     required this.description,
+    required this.medicineUsage,
     required this.barcode,
     required this.unit,
     required this.brand,
@@ -33,6 +35,7 @@ class UpdateMedicine extends Equatable {
         variantid,
         name,
         description,
+        medicineUsage,
         barcode,
         unit,
         brand,

@@ -97,6 +97,9 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
             if (_descriptionController.text.isEmpty) {
               _descriptionController.text = medicine.description ?? "";
             }
+            if (_usageController.text.isEmpty) {
+              _usageController.text = medicine.medicineUsage ?? "";
+            }
             if (_medicineNameController.text.isEmpty) {
               _medicineNameController.text = medicine.name;
             }
@@ -221,7 +224,14 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                               label: "Description",
                               controller: _descriptionController,
                               validator: "Enter description",
-                              maxLines: 3,
+                              maxLines: 7,
+                            ),
+                            const SizedBox(height: 20),
+                            _buildTextField(
+                              label: "Medical Usage",
+                              controller: _usageController,
+                              validator: "Enter medical usage",
+                              maxLines: 7,
                             ),
                           ],
                         ),
@@ -290,6 +300,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                     variantid: selectedVariant.id,
                     name: _medicineNameController.text,
                     description: _descriptionController.text,
+                    medicineUsage: _usageController.text,
                     barcode: selectedVariant.barcode ?? "",
                     unit: selectedVariant.unit ?? "",
                     brand: _brandController.text,

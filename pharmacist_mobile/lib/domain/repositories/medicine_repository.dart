@@ -4,7 +4,11 @@ import '../../core/error/failure.dart';
 import '../entities/medicine.dart';
 
 abstract class MedicineRepository {
-  Future<Either<Failure, List<Medicine>>> searchMedicines(String query);
+  Future<Either<Failure, List<Medicine>>> searchMedicines({
+    required String query,
+    String? filter,
+    String? category,
+  });
   Future<Either<Failure, Medicine>> getMedicineDetails(String id);
   Future<Either<Failure, List<Medicine>>> getAllMedicines();
   Future<Either<Failure, Medicine>> updateMedicine(UpdateMedicine medicine);
