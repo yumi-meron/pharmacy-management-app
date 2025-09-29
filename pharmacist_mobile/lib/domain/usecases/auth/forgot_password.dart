@@ -4,10 +4,9 @@ import 'package:pharmacist_mobile/domain/repositories/auth_repository.dart';
 
 class ForgotPassword {
   final AuthRepository repository;
-
   ForgotPassword(this.repository);
 
-  Future<Either<Failure, void>> call(String phoneNumber) async {
-    return await repository.forgotPassword(phoneNumber);
+  Future<Either<Failure, void>> call(String phoneNumber, String newPassword) {
+    return repository.forgotPassword(phoneNumber, newPassword);
   }
 }
