@@ -8,9 +8,10 @@ import 'package:pharmacist_mobile/core/error/failure.dart';
 import 'package:pharmacist_mobile/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<Either<Failure, UserModel>> signIn(
-      String phoneNumber, String password);
-  Future<Either<Failure, void>> forgotPassword(String phoneNumber);
+  Future<Either<Failure, UserModel>> signIn(String phoneNumber, String password);
+  Future<Either<Failure, void>> forgotPassword(String phoneNumber, String newPassword);
+  // Future<Either<Failure, void>> requestOtp(String phoneNumber);
+  Future<Either<Failure, void>> verifyOtp(String phoneNumber, String otp);
 }
 
 class RemoteDataSourceImpl extends AuthRemoteDataSource {
@@ -20,8 +21,8 @@ class RemoteDataSourceImpl extends AuthRemoteDataSource {
   RemoteDataSourceImpl({required this.dio, required this.secureStorage});
 
   @override
-  Future<Either<Failure, UserModel>> signIn(
-      String phoneNumber, String password) async {
+  Future<Either<Failure, UserModel>> signIn(String phoneNumber, String password) async {
+    await secureStorage.deleteAll();
     try {
       final response = await dio.post(
         '${ApiConstants.baseUrl}${ApiConstants.signIn}',
@@ -31,15 +32,15 @@ class RemoteDataSourceImpl extends AuthRemoteDataSource {
       if (response.statusCode == 200 && response.data['user'] != null) {
         final user = UserModel.fromJson(response.data['user']);
 
-        // Save user as JSON securely
-        await secureStorage.write(
-            key: 'user', value: jsonEncode(user.toJson()));
+        await secureStorage.write(key: 'user', value: jsonEncode(user.toJson()));
 
-        // Save the token securely
         final token = response.data['token'];
         if (token != null) {
-          await secureStorage.write(key: 'token', value: token);
+          await secureStorage.write(key: 'auth_token', value: token);
+          dio.options.headers['Authorization'] = 'Bearer $token';
         }
+      final all = await secureStorage.readAll();
+      print("All keys in storage: $all");
 
         return Right(user);
       } else {
@@ -53,18 +54,20 @@ class RemoteDataSourceImpl extends AuthRemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> forgotPassword(String phoneNumber) async {
+  Future<Either<Failure, void>> forgotPassword(String phoneNumber, String newPassword) async {
     try {
+      // The backend endpoint should accept phone_number and new_password,
+      // store the new password pending OTP, and send OTP to phone.
       final response = await dio.post(
         '${ApiConstants.baseUrl}${ApiConstants.forgotPassword}',
-        data: {'phone_number': phoneNumber},
+        data: {'phone_number': phoneNumber, 'new_password': newPassword},
       );
+      print(response.data);
 
       if (response.statusCode == 200) {
         return const Right(null);
       } else {
-        return Left(ServerFailure(
-            'Failed to process forgot password: ${response.statusCode}'));
+        return Left(ServerFailure('Failed to process forgot password: ${response.statusCode}'));
       }
     } on DioException catch (e) {
       return Left(ServerFailure(_getErrorMessage(e)));
@@ -72,8 +75,47 @@ class RemoteDataSourceImpl extends AuthRemoteDataSource {
       return Left(ServerFailure('Unexpected error: ${e.toString()}'));
     }
   }
-  //get user implementation
-  
+
+  // @override
+  // Future<Either<Failure, void>> requestOtp(String phoneNumber) async {
+  //   try {
+  //     final response = await dio.post(
+  //       '${ApiConstants.baseUrl}${ApiConstants.requestOtp}',
+  //       data: {'phone_number': phoneNumber},
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       return const Right(null);
+  //     } else {
+  //       return Left(ServerFailure('Failed to request OTP: ${response.statusCode}'));
+  //     }
+  //   } on DioException catch (e) {
+  //     return Left(ServerFailure(_getErrorMessage(e)));
+  //   } catch (e) {
+  //     return Left(ServerFailure('Unexpected error: ${e.toString()}'));
+  //   }
+  // }
+
+  @override
+  Future<Either<Failure, void>> verifyOtp(String phoneNumber, String otp) async {
+    try {
+      final response = await dio.post(
+        '${ApiConstants.baseUrl}/auth/reset-password',
+        data: {'phone_number': phoneNumber, 'otp': otp},
+      );
+      print('verifyopt data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        return const Right(null);
+      } else {
+        return Left(ServerFailure('Invalid OTP: ${response.statusCode}'));
+      }
+    } on DioException catch (e) {
+      return Left(ServerFailure(_getErrorMessage(e)));
+    } catch (e) {
+      return Left(ServerFailure('Unexpected error: ${e.toString()}'));
+    }
+  }
 
   String _getErrorMessage(DioException e) {
     if (e.response != null &&

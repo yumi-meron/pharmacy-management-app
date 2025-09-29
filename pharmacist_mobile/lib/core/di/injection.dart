@@ -28,6 +28,8 @@ import 'package:pharmacist_mobile/domain/repositories/medicine_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/cart_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/orders_repository.dart';
 import 'package:pharmacist_mobile/domain/repositories/user_repository.dart';
+import 'package:pharmacist_mobile/domain/usecases/auth/request_otp.dart';
+import 'package:pharmacist_mobile/domain/usecases/auth/verify_otp.dart';
 import 'package:pharmacist_mobile/domain/usecases/medicine/barcode_get_medicine.dart';
 
 // Usecases
@@ -127,9 +129,12 @@ Future<void> setup() async {
     OrdersRepositoryImpl(remote: getIt()),
   );
 
-  // Use Cases
+  // Auth Usecases
   getIt.registerSingleton<SignIn>(SignIn(getIt()));
   getIt.registerSingleton<ForgotPassword>(ForgotPassword(getIt()));
+  // getIt.registerSingleton<RequestOtp>(RequestOtp(getIt()));
+  getIt.registerSingleton<VerifyOtp>(VerifyOtp(getIt()));
+
 
   //User Usecase
   getIt.registerLazySingleton(() => UpdateProfile(getIt()));
@@ -154,9 +159,12 @@ Future<void> setup() async {
 
   // Blocs
   getIt.registerFactory(() => AuthBloc(
-        signIn: getIt(),
-        forgotPassword: getIt(),
-      ));
+      signIn: getIt(),
+      forgotPassword: getIt(),
+      // requestOtp: getIt(),
+      verifyOtp: getIt(),
+    ));
+
 
   getIt.registerFactory(() => ProfileBloc(
       updateProfileUseCase: getIt<UpdateProfile>(),

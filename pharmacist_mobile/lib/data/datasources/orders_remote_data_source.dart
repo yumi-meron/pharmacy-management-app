@@ -28,7 +28,7 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
   }
 
   Future<Map<String, String>> _getHeaders() async {
-    final token = await _storage.read(key: "token");
+    final token = await _storage.read(key: "auth_token");
     final userJson = await _storage.read(key: 'user')?? '';
 
     if (token == null) throw Exception('No token found');

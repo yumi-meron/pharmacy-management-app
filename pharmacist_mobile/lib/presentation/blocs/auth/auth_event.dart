@@ -5,38 +5,53 @@ abstract class AuthEvent extends Equatable {
   const AuthEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class SignInEvent extends AuthEvent {
-  final String email;
+  final String phone;
   final String password;
-
-  const SignInEvent(this.email, this.password);
+  const SignInEvent(this.phone, this.password);
 
   @override
-  List<Object> get props => [email, password];
+  List<Object?> get props => [phone, password];
 }
-class SignedIn extends AuthEvent {
-  final String token;
-  const SignedIn(this.token);
+
+/// Now includes newPassword: we send phone + newPassword to backend to request OTP
+class ForgotPasswordEvent extends AuthEvent {
+  final String phone;
+  final String newPassword;
+  const ForgotPasswordEvent(this.phone, this.newPassword);
+
+  @override
+  List<Object?> get props => [phone, newPassword];
 }
-class UpdateAuthenticatedUser extends AuthEvent {
-  final User user;
-  UpdateAuthenticatedUser(this.user);
+
+// class RequestOtpEvent extends AuthEvent {
+//   final String phone;
+//   const RequestOtpEvent(this.phone);
+
+//   @override
+//   List<Object?> get props => [phone];
+// }
+
+class VerifyOtpEvent extends AuthEvent {
+  final String phone;
+  final String otp;
+  const VerifyOtpEvent(this.phone, this.otp);
+
+  @override
+  List<Object?> get props => [phone, otp];
 }
+
+class AuthLoggedOut extends AuthEvent {}
+
 class AuthCheckRequested extends AuthEvent {}
 
-class ForgotPasswordEvent extends AuthEvent {
-  final String email;
-
-  const ForgotPasswordEvent(this.email);
+class UpdateAuthenticatedUser extends AuthEvent {
+  final User user;
+  const UpdateAuthenticatedUser(this.user);
 
   @override
-  List<Object> get props => [email];
-}
-
-class AuthLoggedOut extends AuthEvent {
-  const AuthLoggedOut();
-  
+  List<Object?> get props => [user];
 }

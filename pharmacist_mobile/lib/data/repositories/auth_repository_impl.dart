@@ -24,9 +24,27 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> forgotPassword(String phoneNumber) async {
+  Future<Either<Failure, void>> forgotPassword(String phoneNumber, String newPassword) async {
     if (await networkInfo.isConnected) {
-      return await remoteDataSource.forgotPassword(phoneNumber);
+      return await remoteDataSource.forgotPassword(phoneNumber, newPassword);
+    } else {
+      return const Left(ConnectionFailure('No internet connection'));
+    }
+  }
+
+  // @override
+  // Future<Either<Failure, void>> requestOtp(String phoneNumber) async {
+  //   if (await networkInfo.isConnected) {
+  //     return await remoteDataSource.requestOtp(phoneNumber);
+  //   } else {
+  //     return const Left(ConnectionFailure('No internet connection'));
+  //   }
+  // }
+
+  @override
+  Future<Either<Failure, void>> verifyOtp(String phoneNumber, String otp) async {
+    if (await networkInfo.isConnected) {
+      return await remoteDataSource.verifyOtp(phoneNumber, otp);
     } else {
       return const Left(ConnectionFailure('No internet connection'));
     }
