@@ -127,52 +127,52 @@ class _HomePageState extends State<HomePage> {
                               child: ListView(
                                 children: [
                                   const SizedBox(height: 20),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 10.0,
-                                    ),
-                                    child: TextField(
-                                      decoration: InputDecoration(
-                                        hintText: 'Search medicines...',
-                                        hintStyle: const TextStyle(
-                                          color: Colors.grey,
-                                        ),
-                                        prefixIcon: const Icon(
-                                          Icons.search,
-                                          color: Colors.grey,
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          vertical: 0,
-                                          horizontal: 16,
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          borderSide: const BorderSide(
-                                            color: Color(0xFFD3D3D3),
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          borderSide: const BorderSide(
-                                            color: Color(0xFFD3D3D3),
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          borderSide: const BorderSide(
-                                            color: Colors.teal,
-                                            width: 1.5,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                  // Padding(
+                                  //   padding: const EdgeInsets.symmetric(
+                                  //     vertical: 10.0,
+                                  //   ),
+                                  //   child: TextField(
+                                  //     decoration: InputDecoration(
+                                  //       hintText: 'Search medicines...',
+                                  //       hintStyle: const TextStyle(
+                                  //         color: Colors.grey,
+                                  //       ),
+                                  //       prefixIcon: const Icon(
+                                  //         Icons.search,
+                                  //         color: Colors.grey,
+                                  //       ),
+                                  //       contentPadding:
+                                  //           const EdgeInsets.symmetric(
+                                  //         vertical: 0,
+                                  //         horizontal: 16,
+                                  //       ),
+                                  //       border: OutlineInputBorder(
+                                  //         borderRadius:
+                                  //             BorderRadius.circular(16),
+                                  //         borderSide: const BorderSide(
+                                  //           color: Color(0xFFD3D3D3),
+                                  //           width: 1.0,
+                                  //         ),
+                                  //       ),
+                                  //       enabledBorder: OutlineInputBorder(
+                                  //         borderRadius:
+                                  //             BorderRadius.circular(16),
+                                  //         borderSide: const BorderSide(
+                                  //           color: Color(0xFFD3D3D3),
+                                  //           width: 1.0,
+                                  //         ),
+                                  //       ),
+                                  //       focusedBorder: OutlineInputBorder(
+                                  //         borderRadius:
+                                  //             BorderRadius.circular(16),
+                                  //         borderSide: const BorderSide(
+                                  //           color: Colors.teal,
+                                  //           width: 1.5,
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   const SizedBox(height: 20),
                                   Container(
                                     height: 120,

@@ -33,6 +33,8 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   mockito: ^5.4.4
   build_runner: ^2.4.9
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
 
 flutter:
   uses-material-design: true
@@ -59,3 +61,14 @@ flutter:
           weight: 800
         - asset: assets/fonts/Poppins-ExtraLight.ttf
           weight: 200
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/tenanet_logo.png"
+  remove_alpha_ios: true
+flutter_native_splash:
+  color: "#0F1A2C"
+  image: assets/images/tenanet_logo.png
+  android: true
+  ios: true

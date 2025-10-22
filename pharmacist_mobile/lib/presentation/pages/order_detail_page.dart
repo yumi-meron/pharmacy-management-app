@@ -249,6 +249,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           Expanded(
             child: OutlinedButton.icon(
               onPressed: () {
+                Navigator.pop(context);
                 // Cancel order
               },
               icon: const Icon(Icons.close, color: Colors.red),
